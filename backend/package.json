@@ -7,7 +7,14 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "seed": "node seed/seedData.js"
+    "seed": "node seed/seedData.js",
+    "build": "cd ../frontend && npm ci --production && npm run build && cp -r dist/* ../backend/public/",
+    "deploy": "./deploy.sh",
+    "pm2:dev": "pm2 start ecosystem.config.js",
+    "pm2:prod": "pm2 start ecosystem.config.js --env production",
+    "pm2:restart": "pm2 restart linda-mama-backend",
+    "pm2:stop": "pm2 stop linda-mama-backend",
+    "pm2:logs": "pm2 logs linda-mama-backend"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
