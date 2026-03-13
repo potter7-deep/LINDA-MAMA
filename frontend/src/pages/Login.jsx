@@ -77,7 +77,7 @@ const Login = () => {
             <img 
               src="/img/logo.png" 
               alt="Linda Mama" 
-              className="h-12 w-12 rounded-xl object-contain shadow-lg group-hover:scale-105 transition-transform duration-200" 
+              className="h-16 w-28 rounded-xl object-contain shadow-lg group-hover:scale-105 transition-transform duration-200" 
             />
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 dark:from-primary-400 dark:to-secondary-400 bg-clip-text text-transparent">
@@ -179,7 +179,7 @@ const Login = () => {
           </div>
 
           {/* Demo Accounts */}
-          <div className="mt-8 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700">
+          {/* <div className="mt-8 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700">
             <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-3 uppercase tracking-wider">Demo Accounts</p>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -199,7 +199,7 @@ const Login = () => {
                 <span className="text-neutral-700 dark:text-neutral-300 font-mono">password123</span>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
