@@ -1,26 +1,23 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Deploying Linda Mama Backend..."
+echo "🚀 Deploying Linda Mama Backend to Render..."
 
-# Install dependencies
-npm ci --production
+# Ensure in backend directory
+cd "$(dirname "$0")"
 
-# Build frontend (if integrated)
-cd ../frontend
-npm ci --production
-npm run build
-cp -r dist/* ../backend/public/
+# Create Render persistent disk directory if needed
+mkdir -p /opt/render/project/src
 
-cd ../backend
+# Install dependencies (postinstall will build frontend)
+echo "📦 Installing dependencies..."
+npm ci
 
-# Run migrations/seed if needed
-# npm run migrate
+# Run seed (idempotent - only adds if missing demo users)
+echo "🌱 Seeding database..."
 npm run seed
 
-# Create logs dir
-mkdir -p logs
-
-echo "✅ Backend deployment complete!"
-echo "Run 'pm2 start ecosystem.config.js --env production' to start"
+echo "✅ Deployment complete!"
+echo "Database: $(node -e \"console.log(require('./config/database.js').defaultPath || 'local')\")"
+echo "Ready: npm start or Render auto-start"
 

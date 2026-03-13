@@ -135,7 +135,7 @@ const AchievementBadges = ({ stats = {} }) => {
             {Math.round((unlockedAchievements.length / achievements.length) * 100)}%
           </span>
         </div>
-        <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+        <div className="h-3 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full transition-all duration-500"
             style={{ width: `${(unlockedAchievements.length / achievements.length) * 100}%` }}

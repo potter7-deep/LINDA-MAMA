@@ -64,6 +64,7 @@ const Layout = () => {
     { path: '/app/mood', label: 'Mood', icon: Smile },
     { path: '/app/appointments', label: 'Appointments', icon: Calendar },
     { path: '/app/chat', label: 'Messages', icon: MessageCircle },
+    { path: '/app/exercise', label: 'Exercise', icon: Activity },
     { path: '/app/emergency', label: 'Emergency', icon: AlertTriangle },
   ];
 

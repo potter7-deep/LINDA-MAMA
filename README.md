@@ -69,3 +69,49 @@ Responsive: Mobile-First Design
 **Made with ❤️ for Kenyan mothers**
 
 [Deployed Live](https://linda-mama.onrender.com)
+
+## 🛫 Render.com Deployment Guide
+
+### 🚀 Quick Start (Free Tier)
+
+1. Push to GitHub repository
+2. [Render Dashboard](https://dashboard.render.com) → New → Web Service → Connect GitHub repo
+3. **Settings**:
+   - Runtime: **Node**
+   - Build Command: `npm ci && npm run build`
+   - Start Command: `npm start`
+4. Deploy!
+
+### ⚙️ Environment Variables (Environment tab)
+
+```
+NODE_ENV=production
+JWT_SECRET=generate-a-super-secure-64-char-jwt-secret-here
+RATE_LIMIT_WINDOW_MS=900000
+AUTH_RATE_LIMIT_MAX=10
+CORS_ORIGIN=https://your-app-name.onrender.com  # Optional for SPA
+DB_PATH=/data/linda_mama.db  # With persistent disk
+```
+
+### 💾 Database Options
+
+**Free Tier (Ephemeral SQLite)**: Data resets on redeploy/sleep wakeup
+
+**Starter ($7/mo, Recommended)**:
+1. Add Persistent Disk (`/data`, 1GB)
+2. Set `DB_PATH=/data/linda_mama.db`
+3. Initial seed: Render Shell → `cd backend && npm run seed`
+
+### 🔍 Verification
+
+- Health: `https://your-app.onrender.com/api/health`
+- Frontend: Root path loads dashboard
+- Demo login: grace@email.com / password123
+
+### 📈 Scale & Upgrade
+
+- Instance Type: Free → Starter for persistence
+- Custom Domain support
+- Auto deploys on git push
+
+**Note**: Seed script clears data (demo only). Production data backup manual.

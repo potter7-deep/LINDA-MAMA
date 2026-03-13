@@ -141,7 +141,7 @@ const HospitalBagChecklist = () => {
 
       {/* Progress bar */}
       <div className="mb-6">
-        <div className="h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+      <div className="h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-primary-500 to-pink-500 rounded-full transition-all duration-500"
             style={{ width: `${progress}%` }}

@@ -9,8 +9,13 @@ const __dirname = path.dirname(__filename);
 // Use absolute path to ensure database is created in the correct location
 const projectRoot = path.resolve(__dirname, '..');
 
-// Store database in backend folder to keep it with the project
-const dbPath = path.join(projectRoot, 'linda_mama.db');
+// Database path - configurable via DB_PATH env var (Render: /opt/render/project/src/linda_mama.db)
+const dbPath = process.env.DB_PATH || path.join(projectRoot, 'linda_mama.db');
+
+// Render persistent disk handling
+if (process.env.NODE_ENV === 'production' && !dbPath.startsWith('/opt/render')) {
+  console.warn('[Database] For Render production, set DB_PATH=/opt/render/project/src/linda_mama.db and add persistent disk');
+}
 
 // Ensure the directory exists
 const dbDirPath = path.dirname(dbPath);
@@ -18,7 +23,7 @@ if (!fs.existsSync(dbDirPath)) {
   fs.mkdirSync(dbDirPath, { recursive: true });
 }
 
-console.log('[Database] Database path:', dbPath);
+console.log('[Database] Using path:', dbPath, process.env.NODE_ENV === 'production' ? '(Production - ensure persistent disk!)' : '(Development)');
 
 // Create database connection
 const db = new Database(dbPath);
@@ -37,7 +42,7 @@ db.exec(`
     phone TEXT,
     dateOfBirth TEXT,
     address TEXT,
-isActive INTEGER DEFAULT 1,
+    isActive INTEGER DEFAULT 1,
     region TEXT,
     hospitals TEXT,
     isDemo INTEGER DEFAULT 0,

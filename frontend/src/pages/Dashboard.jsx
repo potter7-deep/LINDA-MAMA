@@ -130,20 +130,17 @@ const Dashboard = () => {
         api.get(`/emergency/user/${user.id}`),
       ]);
       
-      // Data is already extracted by the API interceptor
       setPregnancyData(pregnancyRes[0] || null);
       setNutritionPlans(nutritionRes);
       setImmunizations(immunizationRes);
       setEmergencies(emergencyRes);
       
-      // Initialize animated stats
       setAnimatedStats({
         nutrition: 0,
         immunizations: 0,
         weeks: 0
       });
       
-      // Animate counters - data is already extracted
       animateValue('nutrition', 0, nutritionRes.length, 500);
       animateValue('immunizations', 0, immunizationRes.length, 500);
       if (pregnancyRes[0]) {
@@ -172,7 +169,6 @@ const Dashboard = () => {
   const nextTip = () => setCurrentTip((prev) => (prev + 1) % weeklyTips.length);
   const prevTip = () => setCurrentTip((prev) => (prev - 1 + weeklyTips.length) % weeklyTips.length);
 
-  // Skeleton loading component
   const StatCardSkeleton = () => (
     <div className="card animate-pulse">
       <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-24 mb-3"></div>
@@ -192,15 +188,10 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="space-y-6">
-        {/* Hero Skeleton */}
         <div className="h-48 bg-gradient-to-r from-primary-500 via-primary-600 to-secondary-500 rounded-2xl animate-pulse"></div>
-        
-        {/* Stats Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => <StatCardSkeleton key={i} />)}
         </div>
-        
-        {/* Quick Actions Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => <QuickActionSkeleton key={i} />)}
         </div>
@@ -208,11 +199,9 @@ const Dashboard = () => {
     );
   }
 
-  // Provider/Admin Dashboard
   if (user?.role !== 'mother') {
     return (
       <div className="space-y-6">
-        {/* Welcome Banner */}
         <div className="relative overflow-hidden bg-gradient-to-r from-primary-500 via-primary-600 to-secondary-600 rounded-2xl p-8 text-white">
           <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
           <div className="relative z-10">
@@ -230,7 +219,6 @@ const Dashboard = () => {
           <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-secondary-500/30 rounded-full blur-3xl"></div>
         </div>
 
-        {/* Quick Links */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {(user?.role === 'provider' || user?.role === 'admin') && (
             <Link to="/app/provider" className="card-hover group flex items-center gap-4 p-4 border-2 border-transparent hover:border-primary-200 dark:hover:border-primary-500/30">
@@ -273,10 +261,8 @@ const Dashboard = () => {
     );
   }
 
-  // Mother's Dashboard
   return (
     <div className="space-y-6">
-      {/* Welcome Banner */}
       <div className="relative overflow-hidden bg-gradient-to-r from-primary-500 via-primary-600 to-secondary-600 rounded-2xl p-8 text-white">
         <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
         <div className="relative z-10">
@@ -299,15 +285,59 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-        {/* Decorative elements */}
         <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
         <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-secondary-500/30 rounded-full blur-3xl"></div>
         <div className="absolute left-1/2 top-0 h-full w-1 bg-white/5"></div>
       </div>
 
-      {/* Weekly Tips Carousel */}
-      <div className={`card bg-gradient-to-r ${weeklyTips[currentTip].color || 'from-primary-50 to-secondary-50'} dark:from-primary-900/20 dark:to-secondary-900/20 border border-primary-100 dark:border-primary-500/20 overflow-hidden`}>
-        {/* Animated gradient background */}
+      {pregnancyData && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="card-hover group flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/30 group-hover:scale-110 transition-transform">
+              <Baby className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">Pregnancy Week</p>
+              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{animatedStats.weeks || pregnancyData.weeks}</p>
+              <p className="text-xs text-neutral-400">of 40 weeks</p>
+            </div>
+          </div>
+
+          <div className="card-hover group flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary-400 to-secondary-600 flex items-center justify-center shadow-lg shadow-secondary-500/30 group-hover:scale-110 transition-transform">
+              <Calendar className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">Due Date</p>
+              <p className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
+                {new Date(pregnancyData.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </p>
+            </div>
+          </div>
+
+          <div className="card-hover group flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-success-400 to-success-600 flex items-center justify-center shadow-lg shadow-success-500/30 group-hover:scale-110 transition-transform">
+              <UtensilsCrossed className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">Nutrition Plans</p>
+              <p className="text-3xl font-bold text-success-600 dark:text-success-400">{animatedStats.nutrition || nutritionPlans.length}</p>
+            </div>
+          </div>
+
+          <div className="card-hover group flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-info-400 to-info-600 flex items-center justify-center shadow-lg shadow-info-500/30 group-hover:scale-110 transition-transform">
+              <Syringe className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">Children</p>
+              <p className="text-3xl font-bold text-info-600 dark:text-info-400">{animatedStats.immunizations || immunizations.length}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className={`card bg-gradient-to-r ${weeklyTips[currentTip].color || 'from-primary-50 to-secondary-50'} dark:from-primary-900/50 dark:to-secondary-900/50 border border-primary-100 dark:border-primary-500/50 overflow-hidden shadow-lg shadow-primary-500/10 dark:shadow-primary-500/30`}>
         <div className="absolute inset-0 bg-gradient-to-r opacity-10 dark:opacity-5" style={{ background: `linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to))` }}></div>
         
         <div className="relative z-10">
@@ -338,8 +368,8 @@ const Dashboard = () => {
             </div>
           </div>
           
-          <div className="flex items-start gap-4 p-4 bg-white/70 dark:bg-neutral-800/70 rounded-xl backdrop-blur-sm">
-            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${weeklyTips[currentTip].color || 'from-primary-400 to-primary-600'} flex items-center justify-center flex-shrink-0 shadow-lg`}>
+          <div className="flex items-start gap-4 p-4 bg-white/70 dark:bg-neutral-800/70 rounded-xl backdrop-blur-sm border border-white/20 dark:border-neutral-600">
+            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${weeklyTips[currentTip].color} flex items-center justify-center flex-shrink-0 shadow-lg dark:shadow-lg dark:shadow-[0_0_20px_rgba(var(--primary),0.3)]`}>
               {(() => {
                 const Icon = weeklyTips[currentTip].icon;
                 return <Icon className="w-7 h-7 text-white" />;
@@ -356,10 +386,10 @@ const Dashboard = () => {
               <button
                 key={idx}
                 onClick={() => setCurrentTip(idx)}
-                className={`h-2 rounded-full transition-all duration-300 ${
+                className={`h-2 rounded-full transition-all duration-300 shadow-sm ${
                   idx === currentTip 
-                    ? `w-10 bg-gradient-to-r ${tip.color || 'from-primary-500 to-secondary-500'}` 
-                    : 'w-2 bg-neutral-300 dark:bg-neutral-600 hover:bg-primary-300'
+                    ? `w-10 bg-gradient-to-r ${tip.color || 'from-primary-500 to-secondary-500'} shadow-primary-500/50 dark:shadow-primary-400/50` 
+                    : 'w-2 bg-neutral-300 dark:bg-neutral-500 hover:bg-primary-300 dark:hover:bg-primary-400 hover:shadow-primary-400/50'
                 }`}
               />
             ))}
@@ -367,77 +397,26 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      {pregnancyData ? (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="card-hover group flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/30 group-hover:scale-110 transition-transform">
-              <Baby className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Pregnancy Week</p>
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{animatedStats.weeks || pregnancyData.weeks}</p>
-              <p className="text-xs text-neutral-400">of 40 weeks</p>
-            </div>
-          </div>
-
-          <div className="card-hover group flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-secondary-400 to-secondary-600 flex items-center justify-center shadow-lg shadow-secondary-500/30 group-hover:scale-110 transition-transform">
-              <Calendar className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Due Date</p>
-              <p className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
-                {new Date(pregnancyData.dueDate).toLocaleDateString('en-US', { 
-                  month: 'short', 
-                  day: 'numeric',
-                  year: 'numeric'
-                })}
-              </p>
-            </div>
-          </div>
-
-          <div className="card-hover group flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-success-400 to-success-600 flex items-center justify-center shadow-lg shadow-success-500/30 group-hover:scale-110 transition-transform">
-              <UtensilsCrossed className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Nutrition Plans</p>
-              <p className="text-3xl font-bold text-success-600 dark:text-success-400">{animatedStats.nutrition || nutritionPlans.length}</p>
-            </div>
-          </div>
-
-          <div className="card-hover group flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-info-400 to-info-600 flex items-center justify-center shadow-lg shadow-info-500/30 group-hover:scale-110 transition-transform">
-              <Syringe className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Children</p>
-              <p className="text-3xl font-bold text-info-600 dark:text-info-400">{animatedStats.immunizations || immunizations.length}</p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="card bg-warning-50 dark:bg-warning-900/20 border-2 border-warning-200 dark:border-warning-700">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-warning-100 dark:bg-warning-900/50 flex items-center justify-center flex-shrink-0">
-              <AlertTriangle className="w-6 h-6 text-warning-600 dark:text-warning-400" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-warning-800 dark:text-warning-300 mb-1">Get Started</h3>
-              <p className="text-warning-700 dark:text-warning-400 mb-4">
-                You haven't added your pregnancy information yet. Start tracking your pregnancy journey today.
-              </p>
-              <Link to="/app/pregnancy" className="btn-warning btn-sm inline-flex items-center gap-2">
-                Add Pregnancy Details
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+      {!pregnancyData && (
+        <div className="relative overflow-hidden bg-gradient-to-r from-warning-400 via-warning-500 to-warning-600 rounded-2xl p-8 text-white mb-8 shadow-2xl">
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+          <div className="relative z-10">
+            <div className="flex items-start gap-4">
+              <AlertTriangle className="w-12 h-12 text-white/90 animate-pulse mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="text-2xl font-bold mb-2">🚀 Get Started!</h3>
+                <p className="text-warning-100 text-lg mb-6 leading-relaxed">
+                  Add your pregnancy details to unlock full features like achievements, hospital bag checklist, trackers, and personalized recommendations.
+                </p>
+                <Link to="/app/pregnancy" className="bg-white text-warning-600 font-bold px-8 py-3 rounded-xl hover:bg-warning-50 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] inline-flex items-center">
+                  Add Pregnancy Info Now <ArrowRight className="w-5 h-5 ml-1" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Quick Actions */}
       <div>
         <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -493,44 +472,31 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* New Feature Widgets */}
-      {pregnancyData && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <BabySizeVisualizer currentWeek={pregnancyData.weeks} />
-          <WaterIntakeTracker dailyGoal={2000} />
-          <AchievementBadges stats={{
-            nutritionPlans: nutritionPlans.length,
-            appointments: 0,
-            moodLogs: 0,
-            immunizations: immunizations.length,
-            emergencySet: emergencies.length > 0,
-            weeks: pregnancyData.weeks,
-            goalsCompleted: 0
-          }} />
-        </div>
-      )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <AchievementBadges stats={{
+          nutritionPlans: nutritionPlans.length || 0,
+          appointments: 0,
+          moodLogs: 0,
+          immunizations: immunizations.length || 0,
+          emergencySet: emergencies.length > 0,
+          weeks: pregnancyData?.weeks || 0,
+          goalsCompleted: 0
+        }} />
+        <WaterIntakeTracker dailyGoal={2000} />
+        <HospitalBagChecklist />
+      </div>
 
-      {/* Pregnancy Countdown & Contraction Timer */}
-      {pregnancyData && pregnancyData.dueDate && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <PregnancyCountdown dueDate={pregnancyData.dueDate} />
-          <ContractionTimer />
-        </div>
-      )}
-
-      {/* Weight Tracker */}
       {pregnancyData && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {pregnancyData.dueDate && <PregnancyCountdown dueDate={pregnancyData.dueDate} />}
           <WeightTracker 
             currentWeight={pregnancyData.weight || 70} 
             startingWeight={65}
             dueDate={pregnancyData.dueDate}
           />
-          <HospitalBagChecklist />
         </div>
       )}
 
-      {/* Chat Quick Access */}
       <div className="card bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-primary-900/20 dark:to-secondary-900/20 border border-primary-100 dark:border-primary-500/20">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -548,9 +514,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Emergencies */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Recent Emergency Reports</h3>
@@ -591,7 +555,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Current Pregnancy Info */}
         {pregnancyData && (
           <div className="card">
             <div className="flex items-center justify-between mb-4">
