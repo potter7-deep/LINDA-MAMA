@@ -247,7 +247,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).json(response);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   const mode = process.env.NODE_ENV || 'development';
   console.log(`
 ╔════════════════════════════════════════════════════════════════════╗
