@@ -6,7 +6,7 @@ import db from '../config/database.js';
 const router = express.Router();
 
 // Get user's exercise logs
-router.get('/:userId', authenticateToken, async (req, res) => {
+router.get('/:userId', authenticateToken, (req, res) => {
   try {
     const { userId } = req.params;
     const userIdNum = parseInt(userId);
@@ -15,13 +15,12 @@ router.get('/:userId', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const [rows] = await db.execute(
-      `SELECT * FROM exercise_logs 
-       WHERE userId = ? 
-       ORDER BY date DESC, createdAt DESC 
-       LIMIT 50`,
-      [userIdNum]
-    );
+    const rows = db.prepare(`
+      SELECT * FROM exercise_logs 
+      WHERE userId = ? 
+      ORDER BY date DESC, createdAt DESC 
+      LIMIT 50
+    `).all(userIdNum);
 
     res.json(rows);
   } catch (error) {
@@ -38,7 +37,7 @@ router.post('/', authenticateToken, [
   body('duration').isInt({ min: 1, max: 180 }),
   body('intensity').optional().isIn(['low', 'medium', 'high']),
   body('notes').optional().isLength({ max: 500 })
-], async (req, res) => {
+], (req, res) => {
   try {
     const { userId, date = new Date().toISOString().split('T')[0], type, duration, intensity, notes } = req.body;
     const userIdNum = parseInt(userId);
@@ -47,18 +46,14 @@ router.post('/', authenticateToken, [
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const [result] = await db.execute(
-      `INSERT INTO exercise_logs (userId, date, type, duration, intensity, notes, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [userIdNum, date, type, duration, intensity || null, notes || null]
-    );
+    const result = db.prepare(`
+      INSERT INTO exercise_logs (userId, date, type, duration, intensity, notes, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    `).run(userIdNum, date, type, duration, intensity || null, notes || null);
 
-    const [log] = await db.execute(
-      'SELECT * FROM exercise_logs WHERE id = ?',
-      [result.insertId]
-    );
+    const log = db.prepare('SELECT * FROM exercise_logs WHERE id = ?').get(result.lastInsertRowid);
 
-    res.status(201).json(log[0]);
+    res.status(201).json(log);
   } catch (error) {
     console.error('Create exercise log error:', error);
     res.status(500).json({ error: 'Failed to create exercise log' });
@@ -72,10 +67,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     const { duration, intensity, notes } = req.body;
     const idNum = parseInt(id);
 
-    const [existing] = await db.execute(
-      'SELECT * FROM exercise_logs WHERE id = ?',
-      [idNum]
-    );
+    const existing = db.prepare('SELECT * FROM exercise_logs WHERE id = ?').all(idNum);
 
     if (existing.length === 0) {
       return res.status(404).json({ error: 'Exercise log not found' });
@@ -86,17 +78,13 @@ router.put('/:id', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    await db.execute(
-      `UPDATE exercise_logs 
-       SET duration = ?, intensity = ?, notes = ?, updatedAt = NOW()
-       WHERE id = ?`,
-      [duration, intensity || null, notes || null, idNum]
-    );
+    db.prepare(`
+      UPDATE exercise_logs 
+      SET duration = ?, intensity = ?, notes = ?, updatedAt = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(duration, intensity || null, notes || null, idNum);
 
-const [updated] = await db.execute(
-      'SELECT * FROM exercise_logs WHERE id = ?',
-      [idNum]
-    );
+    const updated = db.prepare('SELECT * FROM exercise_logs WHERE id = ?').all(idNum);
 
     res.json(updated[0]);
   } catch (error) {
@@ -111,10 +99,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     const idNum = parseInt(id);
 
-    const [existing] = await db.execute(
-      'SELECT * FROM exercise_logs WHERE id = ?',
-      [idNum]
-    );
+    const existing = db.prepare('SELECT * FROM exercise_logs WHERE id = ?').all(idNum);
 
     if (existing.length === 0) {
       return res.status(404).json({ error: 'Exercise log not found' });
@@ -125,7 +110,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    await db.execute('DELETE FROM exercise_logs WHERE id = ?', [idNum]);
+    db.prepare('DELETE FROM exercise_logs WHERE id = ?').run(idNum);
     res.json({ message: 'Exercise log deleted' });
   } catch (error) {
     console.error('Delete exercise log error:', error);
@@ -143,26 +128,19 @@ router.get('/:userId/stats', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const [total] = await db.execute(
-      'SELECT COUNT(*) as total FROM exercise_logs WHERE userId = ?',
-      [userIdNum]
-    );
-    const [weekly] = await db.execute(
-      `SELECT COUNT(*) as weekly 
-       FROM exercise_logs 
-       WHERE userId = ? AND date >= DATE_SUB(CURDATE(), INTERVAL 1 WEEK)`,
-      [userIdNum]
-    );
-    const [totalDuration] = await db.execute(
-      `SELECT SUM(duration) as totalDuration FROM exercise_logs WHERE userId = ?`,
-      [userIdNum]
-    );
+    const total = db.prepare('SELECT COUNT(*) as total FROM exercise_logs WHERE userId = ?').get(userIdNum);
+    const weekly = db.prepare(`
+      SELECT COUNT(*) as weekly 
+      FROM exercise_logs 
+      WHERE userId = ? AND date >= date('now', '-7 days')
+    `).get(userIdNum);
+    const totalDuration = db.prepare('SELECT SUM(duration) as totalDuration FROM exercise_logs WHERE userId = ?').get(userIdNum);
 
     res.json({
-      total: total[0].total,
-      weekly: weekly[0].weekly,
-      totalDuration: totalDuration[0].totalDuration || 0,
-      averageDuration: total[0].total > 0 ? Math.round((totalDuration[0].totalDuration || 0) / total[0].total) : 0
+      total: total.total,
+      weekly: weekly.weekly,
+      totalDuration: totalDuration.totalDuration || 0,
+      averageDuration: total.total > 0 ? Math.round((totalDuration.totalDuration || 0) / total.total) : 0
     });
   } catch (error) {
     console.error('Get exercise stats error:', error);

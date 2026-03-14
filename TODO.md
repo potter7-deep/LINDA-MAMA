@@ -1,46 +1,18 @@
-# Linda Mama Render.com Deployment TODO
+# Backend Fix Progress - IMPLEMENTATION PHASE
 
-## Plan Status: ✅ APPROVED
+## Approved Plan Steps (Updated):
+1. [x] Clean root/backend: rm -rf node_modules package-lock.json backend/node_modules backend/package-lock.json **(Done)**
+2. [x] Edit backend/package.json - **Skipped** (no JSON syntax issue found)
+3. [x] Run root npm install (workspaces) **(Done - succeeded)**
+4. [x] Verify: npm ls express --workspace=backend **(Done - express resolved)**
+5. [x] **Fix backend/config/database.js SQL syntax error (line 35)** ✅ **(Done - added missing `); to all table creations)**
+6. [ ] cd backend && npm run dev **(should succeed after DB fix)**
+7. [ ] Test: curl http://localhost:3000/api/health
+8. [ ] cd frontend && npm run dev (if needed)
+9. [ ] Update TODO.md final status
+10. [ ] Complete task
 
-### 1. File Edits & Setup (AI Complete)
-- [x] Create this TODO.md
-- [x] Update `backend/package.json` - Add `postinstall: npm run build`
-- [ ] Update `backend/config/database.js` - Ensure Render DB_PATH handling
-- [ ] Update `backend/deploy.sh` - Render-compatible version
-- [ ] Update `README.md` - Add Render deployment instructions
-- [ ] Create `backend/.env.example` - Env var template
+## Current Step: **6/10 - Test backend dev server**
 
-### 2. Environment Variables (Manual - Render Dashboard)
-```
-NODE_ENV=production
-DB_PATH=/opt/render/project/src/linda_mama.db
-CORS_ORIGIN=https://linda-mama.onrender.com
-JWT_SECRET=your-super-secure-jwt-secret-key-change-this-2024
-JWT_EXPIRES_IN=24h
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
-AUTH_RATE_LIMIT_MAX=10
-```
+**Next:** cd backend && npm run dev → verify server starts → health check → frontend
 
-### 3. Render Deployment (Manual Steps)
-- [ ] Push code to GitHub repo
-- [ ] Render.com → New Web Service → Connect GitHub repo (root: backend/)
-- [ ] Build Command: `npm ci`
-- [ ] Start Command: `node index.js`
-- [ ] Add Disk: `/opt/render/project/src` (10GB)
-- [ ] Set all env vars above
-- [ ] Deploy & test https://linda-mama.onrender.com/api/health
-
-### 4. Verification
-- [ ] App loads at root URL
-- [ ] API health check works
-- [ ] Database persists (login with seeded accounts)
-- [ ] Demo accounts work: grace@email.com / password123
-
-### 5. Post-Deploy (Optional)
-- [ ] Custom domain
-- [ ] Auto-deploys from GitHub
-- [ ] Monitoring/alerts
-- [ ] Scale instance if needed
-
-**Next: Proceed to file edits (step 1).**

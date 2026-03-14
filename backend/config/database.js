@@ -31,6 +31,7 @@ const db = new Database(dbPath);
 // Enable foreign keys
 db.pragma('foreign_keys = ON');
 
+// === TABLES ===
 // Create users table
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
@@ -49,8 +50,11 @@ db.exec(`
     lastLogin TEXT,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
+  )
+`);
 
+// pregnancy_records
+db.exec(`
   CREATE TABLE IF NOT EXISTS pregnancy_records (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -64,8 +68,11 @@ db.exec(`
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-  );
+  )
+`);
 
+// health_conditions
+db.exec(`
   CREATE TABLE IF NOT EXISTS health_conditions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -75,8 +82,11 @@ db.exec(`
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-  );
+  )
+`);
 
+// nutrition_plans
+db.exec(`
   CREATE TABLE IF NOT EXISTS nutrition_plans (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -89,8 +99,11 @@ db.exec(`
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-  );
+  )
+`);
 
+// immunization_schedules
+db.exec(`
   CREATE TABLE IF NOT EXISTS immunization_schedules (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -102,8 +115,11 @@ db.exec(`
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
-  );
+  )
+`);
 
+// emergency_reports
+db.exec(`
   CREATE TABLE IF NOT EXISTS emergency_reports (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -119,22 +135,11 @@ db.exec(`
     resolvedAt DATETIME,
     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (assignedProviderId) REFERENCES users(id) ON DELETE SET NULL
-  );
+  )
+`);
 
-  -- Create indexes for better query performance
-  CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-  CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
-  CREATE INDEX IF NOT EXISTS idx_pregnancy_user ON pregnancy_records(userId);
-  CREATE INDEX IF NOT EXISTS idx_pregnancy_due ON pregnancy_records(dueDate);
-  CREATE INDEX IF NOT EXISTS idx_nutrition_user ON nutrition_plans(userId);
-  CREATE INDEX IF NOT EXISTS idx_nutrition_trimester ON nutrition_plans(trimester);
-  CREATE INDEX IF NOT EXISTS idx_immunization_user ON immunization_schedules(userId);
-  CREATE INDEX IF NOT EXISTS idx_emergency_user ON emergency_reports(userId);
-  CREATE INDEX IF NOT EXISTS idx_emergency_status ON emergency_reports(status);
-  CREATE INDEX IF NOT EXISTS idx_emergency_severity ON emergency_reports(severity);
-  CREATE INDEX IF NOT EXISTS idx_emergency_provider ON emergency_reports(assignedProviderId);
-
-  -- Chat tables for mother-provider communication
+// conversations
+db.exec(`
   CREATE TABLE IF NOT EXISTS conversations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     participant1Id INTEGER NOT NULL,
@@ -145,8 +150,11 @@ db.exec(`
     FOREIGN KEY (participant1Id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (participant2Id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT unique_conversation UNIQUE (participant1Id, participant2Id)
-  );
+  )
+`);
 
+// messages
+db.exec(`
   CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     conversationId INTEGER NOT NULL,
@@ -156,15 +164,46 @@ db.exec(`
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (conversationId) REFERENCES conversations(id) ON DELETE CASCADE,
     FOREIGN KEY (senderId) REFERENCES users(id) ON DELETE CASCADE
-  );
-
-  -- Chat indexes
-  CREATE INDEX IF NOT EXISTS idx_conversations_participant1 ON conversations(participant1Id);
-  CREATE INDEX IF NOT EXISTS idx_conversations_participant2 ON conversations(participant2Id);
-  CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversationId);
-  CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(senderId);
-  CREATE INDEX IF NOT EXISTS idx_messages_read ON messages(isRead);
+  )
 `);
+
+// exercise_logs
+db.exec(`
+  CREATE TABLE IF NOT EXISTS exercise_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('yoga', 'walking', 'kegels', 'swimming', 'stretching', 'strength', 'cardio', 'pilates')),
+    duration INTEGER NOT NULL CHECK(duration >= 1 AND duration <= 180),
+    intensity TEXT CHECK(intensity IN ('low', 'medium', 'high')),
+    notes TEXT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+  )
+`);
+
+// === INDEXES ===
+db.exec("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_pregnancy_user ON pregnancy_records(userId)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_pregnancy_due ON pregnancy_records(dueDate)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_nutrition_user ON nutrition_plans(userId)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_nutrition_trimester ON nutrition_plans(trimester)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_immunization_user ON immunization_schedules(userId)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_emergency_user ON emergency_reports(userId)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_emergency_status ON emergency_reports(status)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_emergency_severity ON emergency_reports(severity)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_emergency_provider ON emergency_reports(assignedProviderId)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_conversations_participant1 ON conversations(participant1Id)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_conversations_participant2 ON conversations(participant2Id)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversationId)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(senderId)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_messages_read ON messages(isRead)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_exercise_user ON exercise_logs(userId)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_exercise_date ON exercise_logs(date)");
+
+console.log('[Database] All tables and indexes created successfully.');
 
 // Export the database instance
 export default db;
