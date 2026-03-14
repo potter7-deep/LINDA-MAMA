@@ -4,13 +4,8 @@ import axios from 'axios';
 // In development: uses proxy (relative URL)
 // In production: use the actual backend URL
 const getBaseURL = () => {
-  // Check if we're in production (not development)
-  if (import.meta.env.PROD) {
-    // For production, use the actual backend URL
-    // Change this to your actual production backend URL
-    return import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-  }
-  // In development, use the proxy
+  // Use same-origin '/api' for both dev (proxy) and prod (Render/Vercel same-origin)
+  // Vite proxy handles dev, Render serves backend/frontend from same domain
   return '/api';
 };
 

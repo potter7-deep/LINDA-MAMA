@@ -1,117 +1,93 @@
-# 🏥 Linda Mama - Maternal Healthcare Management System
+# 🏥 Linda Mama - Maternal Healthcare System
 
-## 🎯 Problem Statement
+## 🌟 Features
+- Pregnancy tracking & milestones
+- Personalized nutrition plans
+- Immunization schedules
+- Emergency reporting & provider alerts
+- Chat between mothers/providers
+- Exercise & mood tracking
+- Admin dashboard
 
-Kenya faces significant maternal health challenges:
-- **High maternal mortality rate** (342 per 100,000 live births)
-- **Fragmented patient records** across facilities
-- **Delayed emergency response** (average 4+ hours)
-- **Poor nutrition tracking** leading to complications
-- **Immunization gaps** causing child health risks
+## 🚀 Quick Start (Local)
 
-**Linda Mama** solves these with a **comprehensive digital platform**.
+```bash
+# Install & build
+npm install
+npm run build:frontend && npm run build:backend
 
-## ✨ Core Features
+# Development
+npm run dev:frontend  # http://localhost:5173
+npm run dev:backend   # http://localhost:3000
 
-### 🤰 **Expectant & Nursing Mothers**
-```
-📊 Pregnancy Tracking (weeks, milestones, vitals)
-🥗 AI Nutrition Plans (trimester-specific)
-💉 Immunization Schedules + Reminders
-🚨 Emergency Reporting (GPS + instant alerts)
-📈 Health Metrics Dashboard (weight, BP, contractions)
-```
-
-### 👨‍⚕️ **Healthcare Providers**
-```
-👥 Patient Management Dashboard
-🔔 Real-time Emergency Alerts
-📋 Complete Medical History Access
-📱 Mobile-First Case Management
-📊 Patient Progress Reports
+# Production build
+npm run build:backend  # Builds frontend + copies to backend/public + seeds DB
+npm start              # http://localhost:3000
 ```
 
-### 👑 **Administrators**
+**Test Accounts** (after build/backend seed):
 ```
-👥 User & Role Management
-📈 System Analytics Dashboard
-🔍 Audit Logs & Compliance
-⚙️ Facility Management
-📊 Population Health Insights
+Admin: admin@lindamama.ke / password123
+Provider: provider@lindamama.ke / password123
+Mother: grace@email.com / password123
 ```
 
-## 🏥 Impact Goals
+## ☁️ Production Deployment (Render.com)
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| Emergency Response | 4+ hours | <30 min |
-| Nutrition Compliance | 42% | 85% |
-| Immunization Coverage | 71% | 95% |
-| Maternal Mortality | 342/100k | 100/100k |
+### 1. **Repository** 
+Push to GitHub → Connect Render
 
-## 🔬 Tech Architecture
-
+### 2. **Environment Variables** (Render Dashboard)
 ```
-Frontend: React 18 + Vite + TailwindCSS
-Backend: Node.js + Express + SQLite
-Security: JWT + Rate Limiting + Helmet
-Deployment: Render.com (Free Tier Ready)
-Responsive: Mobile-First Design
-```
-
-## 🎯 Kenyan Context
-- **Linda Mama Scheme** integration ready
-- **Huduma Centres** connectivity
-- **M-Pesa** payment gateway prepared
-- **Offline-first** capability planned
-- **Swahili localization** supported
-
-**Made with ❤️ for Kenyan mothers**
-
-[Deployed Live](https://linda-mama.onrender.com)
-
-## 🛫 Render.com Deployment Guide
-
-### 🚀 Quick Start (Free Tier)
-
-1. Push to GitHub repository
-2. [Render Dashboard](https://dashboard.render.com) → New → Web Service → Connect GitHub repo
-3. **Settings**:
-   - Runtime: **Node**
-   - Build Command: `npm ci && npm run build`
-   - Start Command: `npm start`
-4. Deploy!
-
-### ⚙️ Environment Variables (Environment tab)
-
-```
+JWT_SECRET=your-super-secure-random-64-char-secret
+CORS_ORIGIN=https://your-app.onrender.com
 NODE_ENV=production
-JWT_SECRET=generate-a-super-secure-64-char-jwt-secret-here
-RATE_LIMIT_WINDOW_MS=900000
-AUTH_RATE_LIMIT_MAX=10
-CORS_ORIGIN=https://your-app-name.onrender.com  # Optional for SPA
-DB_PATH=/data/linda_mama.db  # With persistent disk
+DB_PATH=/opt/render/project/src/linda_mama.db
 ```
 
-### 💾 Database Options
+### 3. **Settings**
+```
+Build Command: cd frontend && npm ci && npm run build && cd ../backend && npm ci && rsync -a ../frontend/dist/ ./public/ && npm run seed
+Start Command: npm start
+Instance Type: Free/Mini
+Disk: Persistent (10GB+)
+```
 
-**Free Tier (Ephemeral SQLite)**: Data resets on redeploy/sleep wakeup
+### 4. **Verify**
+```
+Health: https://your-app.onrender.com/api/health
+Demo Login: admin@lindamama.ke / password123
+```
 
-**Starter ($7/mo, Recommended)**:
-1. Add Persistent Disk (`/data`, 1GB)
-2. Set `DB_PATH=/data/linda_mama.db`
-3. Initial seed: Render Shell → `cd backend && npm run seed`
+## 🛠️ Project Structure
+```
+linda-mama/
+├── frontend/          # React + Vite + Tailwind
+├── backend/           # Express + SQLite + JWT
+│   ├── public/        # Built frontend served here
+│   ├── seed/          # Demo data
+│   └── deploy.sh      # PM2/Production
+├── .env.example       # Env vars
+└── package.json       # Workspaces
+```
 
-### 🔍 Verification
+## 🔒 Security
+- JWT authentication (24h tokens)
+- Rate limiting (auth: 10/min, API: 100/15min)
+- Helmet CSP/HSTS
+- bcrypt password hashing
+- SQLite WAL mode + indexes
 
-- Health: `https://your-app.onrender.com/api/health`
-- Frontend: Root path loads dashboard
-- Demo login: grace@email.com / password123
+## 📱 Responsive
+- Mobile-first Tailwind
+- Dark mode
+- PWA-ready
 
-### 📈 Scale & Upgrade
+## 🤝 Contributing
+1. Fork → Clone → Create feature branch
+2. `npm install && npm run build:backend`
+3. Test locally
+4. PR with changelog
 
-- Instance Type: Free → Starter for persistence
-- Custom Domain support
-- Auto deploys on git push
+**Live Demo**: https://linda-mama.onrender.com
 
-**Note**: Seed script clears data (demo only). Production data backup manual.
