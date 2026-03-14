@@ -9,7 +9,7 @@
     "start": "node index.js",
     "dev": "node --watch index.js",
     "seed": "node seed/seedData.js",
-    "build": "echo 'Frontend build/copy skipped in dev; run manually if needed'",
+"build": "cd ../frontend && npm ci && npm run build && cd ../backend && rsync -a ../frontend/dist/ ./public/ && npm ci && npm run seed",
     "deploy": "./deploy.sh",
     "pm2:dev": "pm2 start ecosystem.config.js",
     "pm2:prod": "pm2 start ecosystem.config.js --env production",
