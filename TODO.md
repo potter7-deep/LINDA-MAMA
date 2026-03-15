@@ -1,26 +1,12 @@
-# Linda Mama - NPM Audit \& Config Fix (Updated for Render Fail)
+# Fix Backend package.json JSON Error & Build Issues
 
-## NPM Audit Fix Phase (3/5) ✓
+## Steps:
+- [ ] 1. Fix malformed JSON in backend/package.json (scripts: dev comma, seed/seed:prod formatting)
+- [ ] 2. Test: cd backend && npm install && npm run build
+- [ ] 3. Verify frontend build integration (rsync to public/)
+- [ ] 4. Test local backend server
+- [ ] 5. Update deployment notes if needed
+- [ ] 6. Mark complete & cleanup TODO.md
 
-### Step 1: Cleanup [✓]
-### Step 2: Axios update [✓]
-### Step 3: NPM Config Fix [✓]
-- Created .npmrc files (frontend/, backend/, root/) with public registry.
-- Fixes 'Exit prior to config file resolving' in Render/local CI.
-### Step 4: Install & Audit [ ]
-```
-cd frontend && npm install && npm audit
-cd ../backend && npm install && npm audit
-```
-Expect 0 vulns.
+Current progress: Starting step 1.
 
-### Step 5: Build Test [ ]
-```
-cd frontend && npm run build
-```
-
-## Render Fix
-- Commit/push .npmrc + package.json changes.
-- Redeploy: Build succeeds with npm install.
-
-**Next: Run Step 4 installs locally, paste output. Then commit/push for Render.**
