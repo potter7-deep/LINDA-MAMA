@@ -20,7 +20,7 @@ export const authenticateToken = (req, res, next) => {
     // Verify user still exists in DB
     db.get('SELECT id, email, fullName, role, phone FROM users WHERE id = ?', [decoded.userId], (dbErr, user) => {
       if (dbErr) {
-        console.error('[Auth] DB error:', dbErr);
+
         return res.status(500).json({ error: 'Database error' });
       }
       if (!user) {

@@ -55,9 +55,9 @@ router.post('/register', [
       token
     });
   } catch (error) {
-    console.error('Registration error:', error);
     res.status(500).json({ error: 'Registration failed' });
   }
+
 });
 
 // Login user
@@ -92,9 +92,9 @@ router.post('/login', [
       token
     });
   } catch (error) {
-    console.error('Login error:', error);
     res.status(500).json({ error: 'Login failed' });
   }
+
 });
 
 // Get current user
@@ -111,9 +111,9 @@ router.get('/me', authenticateToken, (req, res) => {
 
     res.json(user);
   } catch (error) {
-    console.error('Get user error:', error);
     res.status(500).json({ error: 'Failed to get user' });
   }
+
 });
 
 // Update profile
@@ -161,9 +161,9 @@ router.put('/profile', authenticateToken, [
 
     res.json(user);
   } catch (error) {
-    console.error('Update profile error:', error);
     res.status(500).json({ error: 'Failed to update profile' });
   }
+
 });
 
 // Change password
@@ -186,9 +186,9 @@ router.put('/password', authenticateToken, [
 
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
-    console.error('Change password error:', error);
     res.status(500).json({ error: 'Failed to change password' });
   }
+
 });
 
 // Get user's health conditions
@@ -202,9 +202,9 @@ router.get('/health-conditions', authenticateToken, (req, res) => {
     
     res.json(conditions);
   } catch (error) {
-    console.error('Get health conditions error:', error);
     res.status(500).json({ error: 'Failed to get health conditions' });
   }
+
 });
 
 // Add health condition
@@ -229,9 +229,9 @@ router.post('/health-conditions', authenticateToken, [
     
     res.status(201).json(condition);
   } catch (error) {
-    console.error('Add health condition error:', error);
     res.status(500).json({ error: 'Failed to add health condition' });
   }
+
 });
 
 // Update health condition
@@ -272,9 +272,9 @@ router.put('/health-conditions/:id', authenticateToken, [
     
     res.json(condition);
   } catch (error) {
-    console.error('Update health condition error:', error);
     res.status(500).json({ error: 'Failed to update health condition' });
   }
+
 });
 
 // Delete health condition
@@ -292,9 +292,9 @@ router.delete('/health-conditions/:id', authenticateToken, (req, res) => {
     
     res.json({ message: 'Health condition removed successfully' });
   } catch (error) {
-    console.error('Delete health condition error:', error);
     res.status(500).json({ error: 'Failed to delete health condition' });
   }
+
 });
 
 export default router;

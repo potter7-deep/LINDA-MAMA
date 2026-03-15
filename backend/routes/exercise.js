@@ -1,5 +1,5 @@
 import express from 'express';
-import { body } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 import { authenticateToken } from '../middleware/auth.js';
 import db from '../config/database.js';
 
@@ -30,6 +30,14 @@ router.get('/:userId', authenticateToken, (req, res) => {
 });
 
 // Create exercise log
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+};
+
 router.post('/', authenticateToken, [
   body('userId').isInt(),
   body('date').optional().isISO8601(),
@@ -37,10 +45,13 @@ router.post('/', authenticateToken, [
   body('duration').isInt({ min: 1, max: 180 }),
   body('intensity').optional().isIn(['low', 'medium', 'high']),
   body('notes').optional().isLength({ max: 500 })
-], (req, res) => {
+], validate, (req, res) => {
   try {
     const { userId, date = new Date().toISOString().split('T')[0], type, duration, intensity, notes } = req.body;
     const userIdNum = parseInt(userId);
+    if (isNaN(userIdNum)) {
+      return res.status(400).json({ error: 'Invalid userId' });
+    }
 
     if (req.user.id !== userIdNum && !['provider', 'admin'].includes(req.user.role)) {
       return res.status(403).json({ error: 'Access denied' });
@@ -61,13 +72,20 @@ router.post('/', authenticateToken, [
 });
 
 // Update exercise log
-router.put('/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateToken, [
+  body('duration').optional().isInt({ min: 1, max: 180 }),
+  body('intensity').optional().isIn(['low', 'medium', 'high']),
+  body('notes').optional().isLength({ max: 500 })
+], validate, async (req, res) => {
   try {
     const { id } = req.params;
     const { duration, intensity, notes } = req.body;
     const idNum = parseInt(id);
+    if (isNaN(idNum)) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
 
-    const existing = db.prepare('SELECT * FROM exercise_logs WHERE id = ?').all(idNum);
+    const existing = db.prepare('SELECT * FROM exercise_logs WHERE id = ?').get(idNum);
 
     if (existing.length === 0) {
       return res.status(404).json({ error: 'Exercise log not found' });
@@ -84,9 +102,9 @@ router.put('/:id', authenticateToken, async (req, res) => {
       WHERE id = ?
     `).run(duration, intensity || null, notes || null, idNum);
 
-    const updated = db.prepare('SELECT * FROM exercise_logs WHERE id = ?').all(idNum);
+    const updated = db.prepare('SELECT * FROM exercise_logs WHERE id = ?').get(idNum);
 
-    res.json(updated[0]);
+    res.json(updated);
   } catch (error) {
     console.error('Update exercise log error:', error);
     res.status(500).json({ error: 'Failed to update exercise log' });
@@ -98,8 +116,11 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const idNum = parseInt(id);
+    if (isNaN(idNum)) {
+      return res.status(400).json({ error: 'Invalid ID' });
+    }
 
-    const existing = db.prepare('SELECT * FROM exercise_logs WHERE id = ?').all(idNum);
+    const existing = db.prepare('SELECT * FROM exercise_logs WHERE id = ?').get(idNum);
 
     if (existing.length === 0) {
       return res.status(404).json({ error: 'Exercise log not found' });

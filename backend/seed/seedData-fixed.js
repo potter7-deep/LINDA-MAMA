@@ -163,55 +163,67 @@ ensureTables((err) => {
           `).run(email, password, fullName, role, phone, region);
         });
 
-        // Wait for users to be inserted
-        setTimeout(() => {
-          const mother1Id = getUserId(db, 'mother1@lindamama.com');
-          const mother2Id = getUserId(db, 'mother2@demo.com');  
-          const providerId = getUserId(db, 'provider@lindamama.com');
-          const mother3Id = getUserId(db, 'mother3@demo.com');
+        // Get user IDs safely after inserts (no timeout needed with serialize)
+        let mother1Id, mother2Id, providerId, mother3Id;
+        try {
+          mother1Id = getUserId(db, 'mother1@lindamama.com');
+          mother2Id = getUserId(db, 'mother2@demo.com');
+          providerId = getUserId(db, 'provider@lindamama.com');
+          mother3Id = getUserId(db, 'mother3@demo.com');
+        } catch (e) {
+          console.error('[Seed] User ID lookup failed:', e.message);
+          db.run('ROLLBACK');
+          return;
+        }
 
-          // Health conditions
-          db.prepare(`INSERT OR IGNORE INTO health_conditions (userId, conditionType, conditionName) VALUES (?, 'anemia', 'Mild anemia (Hb 10.2)')`).run(mother1Id);
-          db.prepare(`INSERT OR IGNORE INTO health_conditions (userId, conditionType, conditionName) VALUES (?, 'none', 'Healthy')`).run(mother2Id);
+        // Health conditions
+        db.prepare(`INSERT OR IGNORE INTO health_conditions (userId, conditionType, conditionName) VALUES (?, 'anemia', 'Mild anemia (Hb 10.2)')`).run(mother1Id);
+        db.prepare(`INSERT OR IGNORE INTO health_conditions (userId, conditionType, conditionName) VALUES (?, 'none', 'Healthy')`).run(mother2Id);
 
-          // Pregnancy records
-          db.prepare(`INSERT OR IGNORE INTO pregnancy_records (userId, weeks, dueDate, weight, notes) VALUES (?, 35, '2025-03-10', 72.5, 'Third trimester, regular checkups')`).run(mother1Id);
-          db.prepare(`INSERT OR IGNORE INTO pregnancy_records (userId, weeks, dueDate, weight, notes) VALUES (?, 28, '2025-01-15', 68.0, 'Second trimester, good progress')`).run(mother2Id);
-          db.prepare(`INSERT OR IGNORE INTO pregnancy_records (userId, weeks, dueDate, weight, notes) VALUES (?, 12, '2025-08-20', 58.2, 'First trimester, morning sickness')`).run(mother3Id);
+        // Pregnancy records
+        db.prepare(`INSERT OR IGNORE INTO pregnancy_records (userId, weeks, dueDate, weight, notes) VALUES (?, 35, '2025-03-10', 72.5, 'Third trimester, regular checkups')`).run(mother1Id);
+        db.prepare(`INSERT OR IGNORE INTO pregnancy_records (userId, weeks, dueDate, weight, notes) VALUES (?, 28, '2025-01-15', 68.0, 'Second trimester, good progress')`).run(mother2Id);
+        db.prepare(`INSERT OR IGNORE INTO pregnancy_records (userId, weeks, dueDate, weight, notes) VALUES (?, 12, '2025-08-20', 58.2, 'First trimester, morning sickness')`).run(mother3Id);
 
-          // Nutrition plans
-          db.prepare(`INSERT OR IGNORE INTO nutrition_plans (userId, trimester, mealPlan, calories, focusNutrients) VALUES (?, 3, 'Balanced prenatal meals', 2500, 'iron,calcium,protein')`).run(mother1Id);
-          db.prepare(`INSERT OR IGNORE INTO nutrition_plans (userId, trimester, mealPlan, calories, focusNutrients) VALUES (?, 2, 'High protein diet', 2300, 'protein,folic-acid')`).run(mother2Id);
+        // Nutrition plans
+        db.prepare(`INSERT OR IGNORE INTO nutrition_plans (userId, trimester, mealPlan, calories, focusNutrients) VALUES (?, 3, 'Balanced prenatal meals', 2500, 'iron,calcium,protein')`).run(mother1Id);
+        db.prepare(`INSERT OR IGNORE INTO nutrition_plans (userId, trimester, mealPlan, calories, focusNutrients) VALUES (?, 2, 'High protein diet', 2300, 'protein,folic-acid')`).run(mother2Id);
 
-          // Emergency reports
-          db.prepare(`INSERT OR IGNORE INTO emergency_reports (userId, type, description, severity) VALUES (?, 'reduced-movement', 'Baby movements reduced today', 'medium')`).run(mother1Id);
-          db.prepare(`INSERT OR IGNORE INTO emergency_reports (userId, type, description, severity) VALUES (?, 'high-blood-pressure', 'BP 150/95, headache', 'high')`).run(mother3Id);
+        // Emergency reports
+        db.prepare(`INSERT OR IGNORE INTO emergency_reports (userId, type, description, severity) VALUES (?, 'reduced-movement', 'Baby movements reduced today', 'medium')`).run(mother1Id);
+        db.prepare(`INSERT OR IGNORE INTO emergency_reports (userId, type, description, severity) VALUES (?, 'high-blood-pressure', 'BP 150/95, headache', 'high')`).run(mother3Id);
 
-          // Immunization
-          db.prepare(`INSERT OR IGNORE INTO immunization_schedules (userId, childName, dateOfBirth, vaccines) VALUES (?, 'Baby Omar', '2024-06-15', 'TT1, TT2, HepB')`).run(mother3Id);
+        // Immunization
+        db.prepare(`INSERT OR IGNORE INTO immunization_schedules (userId, childName, dateOfBirth, vaccines) VALUES (?, 'Baby Omar', '2024-06-15', 'TT1, TT2, HepB')`).run(mother3Id);
 
-          // Exercise logs
-          db.prepare(`INSERT OR IGNORE INTO exercise_logs (userId, date, type, duration) VALUES (?, '2024-12-01', 'walking', 30)`).run(mother1Id);
-          db.prepare(`INSERT OR IGNORE INTO exercise_logs (userId, date, type, duration) VALUES (?, '2024-12-02', 'yoga', 20)`).run(mother2Id);
+        // Exercise logs
+        db.prepare(`INSERT OR IGNORE INTO exercise_logs (userId, date, type, duration) VALUES (?, '2024-12-01', 'walking', 30)`).run(mother1Id);
+        db.prepare(`INSERT OR IGNORE INTO exercise_logs (userId, date, type, duration) VALUES (?, '2024-12-02', 'yoga', 20)`).run(mother2Id);
 
-          // Conversations (mother1 <-> provider)
-          db.prepare(`INSERT OR IGNORE INTO conversations (participant1Id, participant2Id) VALUES (?, ?)`).run(mother1Id, providerId);
-          const convId = db.prepare('SELECT id FROM conversations WHERE participant1Id = ? AND participant2Id = ?').get(Math.min(mother1Id, providerId), Math.max(mother1Id, providerId))?.id;
-          if (convId) {
-            db.prepare(`INSERT OR IGNORE INTO messages (conversationId, senderId, content) VALUES (?, ?, 'Thank you doctor for the advice')`).run(convId, mother1Id);
-            db.prepare(`INSERT OR IGNORE INTO messages (conversationId, senderId, content) VALUES (?, ?, 'You are welcome. Call if symptoms worsen')`).run(convId, providerId);
-          }
+        // Conversations (mother1 <-> provider)
+        db.prepare(`INSERT OR IGNORE INTO conversations (participant1Id, participant2Id) VALUES (?, ?)`).run(mother1Id, providerId);
+        const convId = db.prepare('SELECT id FROM conversations WHERE participant1Id = ? AND participant2Id = ?').get(Math.min(mother1Id, providerId), Math.max(mother1Id, providerId))?.id;
+        if (convId) {
+          db.prepare(`INSERT OR IGNORE INTO messages (conversationId, senderId, content) VALUES (?, ?, 'Thank you doctor for the advice')`).run(convId, mother1Id);
+          db.prepare(`INSERT OR IGNORE INTO messages (conversationId, senderId, content) VALUES (?, ?, 'You are welcome. Call if symptoms worsen')`).run(convId, providerId);
+        }
 
-          console.log('[Seed ✅] Demo data created successfully!');
-          console.log('Login credentials:');
-          console.log('• Admin: admin@lindamama.com / admin123');
-          console.log('• Provider: provider@lindamama.com / provider123'); 
-          console.log('• Mother1: mother1@lindamama.com / mother123');
-          console.log('• Mother2: mother2@demo.com / mother223');
-          console.log('• Mother3: mother3@demo.com / mother323');
+        console.log('[Seed ✅] Demo data created successfully!');
+        console.log('Login credentials:');
+        console.log('• Admin: admin@lindamama.com / admin123');
+        console.log('• Provider: provider@lindamama.com / provider123'); 
+        console.log('• Mother1: mother1@lindamama.com / mother123');
+        console.log('• Mother2: mother2@demo.com / mother223');
+        console.log('• Mother3: mother3@demo.com / mother323');
 
-          db.run('COMMIT');
-        }, 100); // Small delay for inserts
+        db.run('COMMIT');
+      } catch (error) {
+        console.error('[Seed ERROR]', error);
+        db.run('ROLLBACK');
+      }
+    });
+  });
+});
 
       } catch (error) {
         console.error('[Seed ERROR]', error);

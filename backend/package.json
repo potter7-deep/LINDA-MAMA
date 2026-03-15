@@ -1,43 +1,34 @@
 {
   "name": "linda-mama-backend",
   "version": "1.0.0",
-  "description": "Linda Mama Maternal Healthcare Management System Backend",
+  "description": "Linda Mama - Maternal Health Platform Backend",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "echo 'Render-safe: frontend assets pre-committed' && npm run seed:prod",
     "start": "node index.js",
-    "dev": "node --watch index.js",
+    "dev": "NODE_ENV=development nodemon index.js",
     "seed": "node seed/seedData-fixed.js",
-    "seed:prod": "node seed/seedData.js",
-    "build": "npm ci --production && npm run seed:prod",
-    "build:frontend": "cd ../frontend && npm ci && npm run build",
-    "deploy": "./deploy.sh",
-    "pm2:dev": "pm2 start ecosystem.config.js",
-    "pm2:prod": "pm2 start ecosystem.config.js --env production",
-    "pm2:restart": "pm2 restart linda-mama-backend",
-    "pm2:stop": "pm2 stop linda-mama-backend",
-    "pm2:logs": "pm2 logs linda-mama-backend"
+    "seed:prod": "NODE_ENV=production node seed/seedData-fixed.js"
   },
+  "keywords": ["healthcare", "maternal", "pregnancy", "api"],
+  "author": "Linda Mama Team",
+  "license": "MIT",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "sqlite3": "5.1.7",
+    "express": "^4.19.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.1",
-    "express": "^4.18.2",
-    "express-rate-limit": "^8.3.1",
-    "express-validator": "^7.0.1",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "morgan": "^1.10.1"
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "express-rate-limit": "^7.4.0",
+    "dotenv": "^16.4.5",
+    "sqlite3": "^5.1.7",
+    "bcryptjs": "^2.4.3",
+    "express-validator": "^7.2.0",
+    "jsonwebtoken": "^9.0.2"
   },
-  "overrides": {
-    "sqlite3": "5.1.7"
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   },
   "engines": {
-    "node": "22.x",
-    "npm": ">=10.9.0",
-    "strict": true
-  },
-  "engineStrict": true
+    "node": ">=20.0.0"
+  }
 }

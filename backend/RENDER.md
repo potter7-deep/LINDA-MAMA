@@ -26,8 +26,8 @@ Name: linda-mama-backend
 Environment: Node
 Region: Oregon (closest)
 Root Directory: backend/
-**Build Command: npm run build**
-**Start Command: npm start**
+**Build Command: npm install**
+**Start Command: npm run start**
 Instance Type: Free
 ```
 
