@@ -2,33 +2,37 @@ import bcrypt from 'bcryptjs';
 import db from '../config/database.js';
 
 const seedDatabase = async () => {
-  console.log('Seeding database...');
+  console.log('[Database] Seeding with transaction...');
+  
+  // Begin transaction for atomic seeding
+  db.exec('BEGIN TRANSACTION;');
+  
+  try {
+    // Clear child tables first, then parents (reverse dependency order)
+    db.exec('DELETE FROM messages;');
+    db.exec('DELETE FROM conversations;');
+    db.exec('DELETE FROM emergency_reports;');
+    db.exec('DELETE FROM immunization_schedules;');
+    db.exec('DELETE FROM nutrition_plans;');
+    db.exec('DELETE FROM health_conditions;');
+    db.exec('DELETE FROM pregnancy_records;');
+    db.exec('DELETE FROM users;');
 
-  // Clear existing data
-  db.exec(`
-    DELETE FROM messages;
-    DELETE FROM conversations;
-    DELETE FROM emergency_reports;
-    DELETE FROM immunization_schedules;
-    DELETE FROM nutrition_plans;
-    DELETE FROM health_conditions;
-    DELETE FROM pregnancy_records;
-    DELETE FROM users;
-  `);
+    // Reset auto-increment
+    db.exec(`
+      DELETE FROM sqlite_sequence WHERE name IN (
+        'users', 'pregnancy_records', 'nutrition_plans', 
+        'immunization_schedules', 'emergency_reports',
+        'conversations', 'messages', 'health_conditions'
+      );
+    `);
 
-  // Reset auto-increment
-  db.exec(`
-    DELETE FROM sqlite_sequence WHERE name IN (
-      'users', 'pregnancy_records', 'nutrition_plans', 
-      'immunization_schedules', 'emergency_reports',
-      'conversations', 'messages', 'health_conditions'
-    );
-  `);
+    // Hash passwords
+    const passwordHash = await bcrypt.hash('password123', 12);
 
-  // Hash passwords
-  const passwordHash = await bcrypt.hash('password123', 12);
+    console.log('[Seed] Passwords hashed, creating users...');
 
-  // Create users
+    // Create users
   const admin = db.prepare(`
     INSERT INTO users (email, password, fullName, role, phone, dateOfBirth, address, region, hospitals, isDemo)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

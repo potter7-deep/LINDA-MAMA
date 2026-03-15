@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import sqlite3 from 'sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -26,14 +26,14 @@ if (!fs.existsSync(dbDirPath)) {
 console.log('[Database] Using path:', dbPath, process.env.NODE_ENV === 'production' ? '(Production - ensure persistent disk!)' : '(Development)');
 
 // Create database connection
-const db = new Database(dbPath);
+const db = new sqlite3.Database(dbPath);
 
 // Enable foreign keys
-db.pragma('foreign_keys = ON');
+db.run('PRAGMA foreign_keys = ON');
 
 // === TABLES ===
 // Create users table
-db.exec(`
+db.run(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL COLLATE NOCASE,
@@ -54,7 +54,7 @@ db.exec(`
 `);
 
 // pregnancy_records
-db.exec(`
+db.run(`
   CREATE TABLE IF NOT EXISTS pregnancy_records (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -72,7 +72,7 @@ db.exec(`
 `);
 
 // health_conditions
-db.exec(`
+db.run(`
   CREATE TABLE IF NOT EXISTS health_conditions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -86,7 +86,7 @@ db.exec(`
 `);
 
 // nutrition_plans
-db.exec(`
+db.run(`
   CREATE TABLE IF NOT EXISTS nutrition_plans (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -103,7 +103,7 @@ db.exec(`
 `);
 
 // immunization_schedules
-db.exec(`
+db.run(`
   CREATE TABLE IF NOT EXISTS immunization_schedules (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -119,7 +119,7 @@ db.exec(`
 `);
 
 // emergency_reports
-db.exec(`
+db.run(`
   CREATE TABLE IF NOT EXISTS emergency_reports (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -139,7 +139,7 @@ db.exec(`
 `);
 
 // conversations
-db.exec(`
+db.run(`
   CREATE TABLE IF NOT EXISTS conversations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     participant1Id INTEGER NOT NULL,
@@ -154,7 +154,7 @@ db.exec(`
 `);
 
 // messages
-db.exec(`
+db.run(`
   CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     conversationId INTEGER NOT NULL,
@@ -168,7 +168,7 @@ db.exec(`
 `);
 
 // exercise_logs
-db.exec(`
+db.run(`
   CREATE TABLE IF NOT EXISTS exercise_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userId INTEGER NOT NULL,
@@ -184,24 +184,24 @@ db.exec(`
 `);
 
 // === INDEXES ===
-db.exec("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_pregnancy_user ON pregnancy_records(userId)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_pregnancy_due ON pregnancy_records(dueDate)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_nutrition_user ON nutrition_plans(userId)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_nutrition_trimester ON nutrition_plans(trimester)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_immunization_user ON immunization_schedules(userId)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_emergency_user ON emergency_reports(userId)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_emergency_status ON emergency_reports(status)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_emergency_severity ON emergency_reports(severity)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_emergency_provider ON emergency_reports(assignedProviderId)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_conversations_participant1 ON conversations(participant1Id)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_conversations_participant2 ON conversations(participant2Id)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversationId)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(senderId)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_messages_read ON messages(isRead)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_exercise_user ON exercise_logs(userId)");
-db.exec("CREATE INDEX IF NOT EXISTS idx_exercise_date ON exercise_logs(date)");
+db.run("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)");
+db.run("CREATE INDEX IF NOT EXISTS idx_users_role ON users(role)");
+db.run("CREATE INDEX IF NOT EXISTS idx_pregnancy_user ON pregnancy_records(userId)");
+db.run("CREATE INDEX IF NOT EXISTS idx_pregnancy_due ON pregnancy_records(dueDate)");
+db.run("CREATE INDEX IF NOT EXISTS idx_nutrition_user ON nutrition_plans(userId)");
+db.run("CREATE INDEX IF NOT EXISTS idx_nutrition_trimester ON nutrition_plans(trimester)");
+db.run("CREATE INDEX IF NOT EXISTS idx_immunization_user ON immunization_schedules(userId)");
+db.run("CREATE INDEX IF NOT EXISTS idx_emergency_user ON emergency_reports(userId)");
+db.run("CREATE INDEX IF NOT EXISTS idx_emergency_status ON emergency_reports(status)");
+db.run("CREATE INDEX IF NOT EXISTS idx_emergency_severity ON emergency_reports(severity)");
+db.run("CREATE INDEX IF NOT EXISTS idx_emergency_provider ON emergency_reports(assignedProviderId)");
+db.run("CREATE INDEX IF NOT EXISTS idx_conversations_participant1 ON conversations(participant1Id)");
+db.run("CREATE INDEX IF NOT EXISTS idx_conversations_participant2 ON conversations(participant2Id)");
+db.run("CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversationId)");
+db.run("CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(senderId)");
+db.run("CREATE INDEX IF NOT EXISTS idx_messages_read ON messages(isRead)");
+db.run("CREATE INDEX IF NOT EXISTS idx_exercise_user ON exercise_logs(userId)");
+db.run("CREATE INDEX IF NOT EXISTS idx_exercise_date ON exercise_logs(date)");
 
 console.log('[Database] All tables and indexes created successfully.');
 
