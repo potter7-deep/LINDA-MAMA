@@ -98,10 +98,14 @@ router.post('/login', [
 });
 
 // Get current user
-router.get('/me', authenticateToken, (req, res) => {
+router.get('/me', authenticateToken, async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
     const user = db.prepare(`
-      SELECT id, email, fullName, role, phone, dateOfBirth, address, createdAt 
+      SELECT id, email, fullName, role, phone, dateOfBirth, address, createdAt, region, hospitals
       FROM users WHERE id = ?
     `).get(req.user.id);
 
@@ -111,9 +115,9 @@ router.get('/me', authenticateToken, (req, res) => {
 
     res.json(user);
   } catch (error) {
+    console.error('Error in /auth/me:', error);
     res.status(500).json({ error: 'Failed to get user' });
   }
-
 });
 
 // Update profile
