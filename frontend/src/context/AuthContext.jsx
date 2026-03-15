@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
-  const register = async (userData) => {
+    const register = async (userData) => {
     const response = await api.post('/auth/register', userData);
     // Response is already extracted, contains { user, token }
     const { user: newUser, token: newToken } = response;
@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }) => {
     api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
     setToken(newToken);
     setUser(newUser);
+    await fetchUser(); // Ensure profile sync completes
     return newUser;
   };
 

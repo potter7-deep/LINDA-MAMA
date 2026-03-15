@@ -103,7 +103,11 @@ const Register = () => {
         });
       }
       
-      navigate('/app/dashboard');
+      // Role-based redirect
+      const redirectPath = user.role === 'admin' ? '/app/admin' :
+                          user.role === 'provider' ? '/app/provider' :
+                          '/app/dashboard';
+      navigate(redirectPath);
     } catch (err) {
       setErrors({ submit: err.message || err.response?.data?.error || 'Registration failed. Please try again.' });
     } finally {
