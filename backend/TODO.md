@@ -14,9 +14,12 @@
 5. [x] Test: cd backend && npm run seed (should succeed without table errors) ✅
 
 ## Remaining Steps
+1. [ ] Local frontend pre-build: `cd frontend && npm i && npm run build && rsync -a dist/ ../backend/public/`
+2. [ ] Update scripts/docs per plan
+3. [ ] `git add . && git commit -m "Fix Render build" && git push`
+4. [ ] Deploy Render with Build Command: `npm run build`
 5. [x] `cd backend && npm start` test server + demo logins (✅ Server running on port 3000)
-6. [x] Create RENDER.md with deployment steps ✅ *(comprehensive guide ready)*
-7. [ ] Deploy to Render and verify *(See RENDER.md instructions)*
+6. [x] Create RENDER.md with deployment steps ✅
+7. [ ] Deploy to Render and verify
 
 **Updated:** $(date)
-

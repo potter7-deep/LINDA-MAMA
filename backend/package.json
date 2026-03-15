@@ -5,12 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "echo 'Build skipped for dev setup'",
+    "postinstall": "echo 'Render-safe: frontend assets pre-committed' && npm run seed:prod",
     "start": "node index.js",
     "dev": "node --watch index.js",
     "seed": "node seed/seedData-fixed.js",
     "seed:prod": "node seed/seedData.js",
-    "build": "cd ../frontend && npm ci && npm run build && cd ../backend && rsync -a ../frontend/dist/ ./public/ && npm ci --production && npm run seed:prod",
+    "build": "npm ci --production && npm run seed:prod",
     "build:frontend": "cd ../frontend && npm ci && npm run build",
     "deploy": "./deploy.sh",
     "pm2:dev": "pm2 start ecosystem.config.js",
@@ -41,4 +41,3 @@
   },
   "engineStrict": true
 }
-
