@@ -8,6 +8,9 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
+// Force database initialization before routes
+import './config/database.js';
+
 import authRoutes from './routes/auth.js';
 import pregnancyRoutes from './routes/pregnancy.js';
 import nutritionRoutes from './routes/nutrition.js';
