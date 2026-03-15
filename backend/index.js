@@ -85,6 +85,9 @@ app.use('/api/', apiLimiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
 
+// Trust proxy for Render/Cloudflare (rate-limit X-Forwarded-For)
+app.set('trust proxy', 1);
+
 // Logging middleware
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
