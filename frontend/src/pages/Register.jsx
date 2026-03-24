@@ -318,9 +318,9 @@ Create your account and start managing your maternal health journey.
                     </div>
                     <div>
                       <label className="input-label">Hospitals (select all that apply)</label>
-                      <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border rounded-lg bg-neutral-50">
+                      <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border rounded-lg bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-700">
                         {['Kenyatta National Hospital', 'Nairobi Hospital', 'Aga Khan Hospital', 'Mater Misericordiae', 'MP Shah', 'Coast General Hospital', 'Jaramogi Oginga Odinga', 'Nakuru Provincial'].map((hospital) => (
-                          <label key={hospital} className="flex items-center gap-2 p-2 rounded hover:bg-neutral-100 cursor-pointer">
+                          <label key={hospital} className="flex items-center gap-2 p-2 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 cursor-pointer">
                             <input
                               type="checkbox"
                               value={hospital}
@@ -333,7 +333,7 @@ Create your account and start managing your maternal health journey.
                               }}
                               className="rounded"
                             />
-                            <span className="text-sm">{hospital}</span>
+                            <span className="text-sm dark:text-neutral-200">{hospital}</span>
                           </label>
                         ))}
                       </div>
