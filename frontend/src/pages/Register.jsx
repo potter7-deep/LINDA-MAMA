@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { Heart, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, User, Phone, MapPin, Calendar, Users, Activity } from 'lucide-react';
+import { Heart, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, User, Phone, MapPin, Calendar, Users, Activity, Moon, Sun } from 'lucide-react';
 
 const HEALTH_CONDITIONS = [
   { value: 'none', label: 'None / No health conditions' },
@@ -33,6 +33,27 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('darkMode') === 'true' || 
+        window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', isDarkMode);
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -166,7 +187,19 @@ Create your account and start managing your maternal health journey.
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white overflow-y-auto">
+      <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-neutral-900 transition-colors duration-300 overflow-y-auto relative">
+        {/* Dark Mode Toggle */}
+        <button
+          onClick={toggleDarkMode}
+          className="absolute top-4 right-4 p-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all duration-300 z-20"
+        >
+          {isDarkMode ? (
+            <Sun className="w-5 h-5 text-warning-400" />
+          ) : (
+            <Moon className="w-5 h-5 text-primary-600" />
+          )}
+        </button>
+
         <div className="w-full max-w-md">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 mb-8 group">
@@ -175,18 +208,18 @@ Create your account and start managing your maternal health journey.
               alt="Linda Mama" 
             />
             <div>
-              <h1 className="text-2xl font-bold text-neutral-900">Linda Mama</h1>
-              <p className="text-sm text-neutral-500">Create Your Account</p>
+              <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Linda Mama</h1>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">Create Your Account</p>
             </div>
           </Link>
 
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
             Create Account
           </h1>
-          <p className="text-neutral-500 mb-8">Fill in your details to create an account</p>
+          <p className="text-neutral-500 dark:text-neutral-400 mb-8">Fill in your details to create an account</p>
 
           {errors.submit && (
-            <div className="flex items-center gap-2 p-4 mb-6 bg-danger-50 border border-danger-200 rounded-xl text-danger-700">
+            <div className="flex items-center gap-2 p-4 mb-6 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-700 rounded-xl text-danger-700 dark:text-danger-400">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
               <p className="text-sm">{errors.submit}</p>
             </div>
@@ -333,7 +366,7 @@ Create your account and start managing your maternal health journey.
                               }}
                               className="rounded"
                             />
-                            <span className="text-sm dark:text-neutral-200">{hospital}</span>
+                            <span className="text-sm text-neutral-700 dark:text-neutral-100">{hospital}</span>
                           </label>
                         ))}
                       </div>
@@ -348,7 +381,7 @@ Create your account and start managing your maternal health journey.
                 <Activity className="w-4 h-4" />
                 Health Condition (Optional)
               </label>
-              <p className="text-xs text-neutral-500 mb-2">Select any health condition you have for personalized meal recommendations</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Select any health condition you have for personalized meal recommendations</p>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Activity className="h-5 w-5 text-neutral-400" />
@@ -408,8 +441,8 @@ Create your account and start managing your maternal health journey.
 
             <div className="flex items-start gap-2">
               <input type="checkbox" required className="w-4 h-4 mt-0.5 rounded border-neutral-300 text-primary-600 focus:ring-primary-500" />
-              <span className="text-sm text-neutral-600">
-                I agree to the <a href="#" className="text-primary-600 hover:underline">Terms of Service</a> and <a href="#" className="text-primary-600 hover:underline">Privacy Policy</a>
+              <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                I agree to the <a href="#" className="text-primary-600 dark:text-primary-400 hover:underline">Terms of Service</a> and <a href="#" className="text-primary-600 dark:text-primary-400 hover:underline">Privacy Policy</a>
               </span>
             </div>
 
@@ -430,9 +463,9 @@ Create your account and start managing your maternal health journey.
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-neutral-600">
+            <p className="text-neutral-600 dark:text-neutral-400">
               Already have an account?{' '}
-              <Link to="/login" className="text-primary-600 font-medium hover:text-primary-700">
+              <Link to="/login" className="text-primary-600 dark:text-primary-400 font-medium hover:text-primary-700">
                 Sign in
               </Link>
             </p>
