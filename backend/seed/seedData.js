@@ -1,11 +1,24 @@
+
 import bcrypt from 'bcryptjs';
 import db from '../config/database.js';
+import path from 'path';
+
+console.log('[Seed] (DEBUG) Current working directory:', process.cwd());
+try {
+  // Try to log the db path if possible
+  if (db && db.name) {
+    console.log('[Seed] (DEBUG) Database path:', db.name);
+  } else {
+    console.log('[Seed] (DEBUG) Database path property not available.');
+  }
+} catch (e) {
+  console.log('[Seed] (DEBUG) Could not log db path:', e);
+}
 
 const seedDatabase = async () => {
   console.log('[Database] Seeding with transaction...');
 
-  // Begin transaction for atomic seeding
-  db.exec('BEGIN TRANSACTION;');
+  // (Removed explicit transaction for isolation test)
 
   try {
     // Clear child tables first, then parents (reverse dependency order)
@@ -17,10 +30,11 @@ const seedDatabase = async () => {
     db.exec('DELETE FROM health_conditions;');
     db.exec('DELETE FROM pregnancy_records;');
     db.exec('DELETE FROM users;');
+    console.log('[Seed] (DEBUG) Ran DELETE FROM users');
     // ...existing code...
     // End of seeding logic
 
-    db.exec('COMMIT;');
+    // (Removed explicit commit for isolation test)
     console.log('Database seeded successfully!');
     console.log('\nTest Accounts:');
     console.log('Admin: admin@lindamama.ke / password123');
@@ -31,6 +45,7 @@ const seedDatabase = async () => {
   } catch (err) {
     db.exec('ROLLBACK;');
     console.error('Seeding failed:', err);
+    console.error('[Seed] (DEBUG) ROLLBACK executed due to error above.');
   }
 };
 
@@ -64,6 +79,7 @@ const seedDatabase = async () => {
     JSON.stringify(['Kenyatta National Hospital', 'Nairobi Hospital']),
     0
   );
+  console.log('[Seed] Inserted admin:', admin);
 
   const provider = db.prepare(`
     INSERT INTO users (email, password, fullName, role, phone, dateOfBirth, address, region, hospitals, isDemo)
@@ -80,6 +96,7 @@ const seedDatabase = async () => {
     JSON.stringify(['Kenyatta National Hospital']),
     0
   );
+  console.log('[Seed] Inserted provider:', provider);
 
   const mother1 = db.prepare(`
     INSERT INTO users (email, password, fullName, role, phone, dateOfBirth, address, region, hospitals, isDemo)
@@ -96,6 +113,7 @@ const seedDatabase = async () => {
     null,
     1
   );
+  console.log('[Seed] Inserted mother1:', mother1);
 
   const mother2 = db.prepare(`
     INSERT INTO users (email, password, fullName, role, phone, dateOfBirth, address, region, hospitals, isDemo)
@@ -129,196 +147,7 @@ const seedDatabase = async () => {
     1
   );
 
-  // Add health conditions for demo users
-  db.prepare(`
-    INSERT INTO health_conditions (userId, conditionType, conditionName)
-    VALUES (?, ?, ?)
-  `).run(
-    mother1.lastInsertRowid,
-    'diabetes',
-    'Gestational Diabetes'
-  );
-
-  db.prepare(`
-    INSERT INTO health_conditions (userId, conditionType, conditionName)
-    VALUES (?, ?, ?)
-  `).run(
-    mother2.lastInsertRowid,
-    'anemia',
-    'Iron Deficiency Anemia'
-  );
-
-  // Pregnancy records
-  db.prepare(`
-    INSERT INTO pregnancy_records (userId, weeks, dueDate, milestones, notes, weight, bloodPressure, symptoms)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    mother3.lastInsertRowid,
-    24,
-    '2024-09-15',
-    JSON.stringify(['Baby can hear', 'Rapid brain development', 'Taste buds forming']),
-    'Second trimester progressing well',
-    62,
-    '120/80',
-    'Mild fatigue, occasional backache'
-  );
-
-  db.prepare(`
-    INSERT INTO pregnancy_records (userId, weeks, dueDate, milestones, notes, weight, bloodPressure, symptoms)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    mother1.lastInsertRowid,
-    32,
-    '2024-06-20',
-    JSON.stringify(['Baby responds to sounds', 'Lungs developing', 'Bone marrow making blood cells']),
-    'Third trimester, weekly checkups',
-    70,
-    '118/75',
-    'Heartburn, leg cramps'
-  );
-
-  db.prepare(`
-    INSERT INTO pregnancy_records (userId, weeks, dueDate, milestones, notes, weight, bloodPressure, symptoms)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    mother2.lastInsertRowid,
-    16,
-    '2024-11-10',
-    JSON.stringify(['Gender determination possible', 'Facial features developing']),
-    'Everything progressing normally',
-    55,
-    '115/70',
-    'Morning sickness subsiding'
-  );
-
-  // Create nutrition plans
-  db.prepare(`
-    INSERT INTO nutrition_plans (userId, trimester, mealPlan, recommendations, calories, focusNutrients)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run(
-    mother3.lastInsertRowid,
-    2,
-    JSON.stringify({
-      breakfast: 'Oatmeal with fruits, fortified cereal with milk, orange juice',
-      lunch: 'Grilled chicken salad with whole grains, vegetable soup',
-      dinner: 'Baked fish with quinoa and steamed vegetables',
-      snacks: 'Yogurt, nuts, fresh fruits, cheese'
-    }),
-    'Focus on calcium (1200mg), iron (27mg), protein (75g). Stay hydrated with 8-10 glasses of water daily.',
-    2340,
-    'Calcium, Iron, Vitamin D, Protein, Omega-3'
-  );
-
-  db.prepare(`
-    INSERT INTO nutrition_plans (userId, trimester, mealPlan, recommendations, calories, focusNutrients)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run(
-    mother1.lastInsertRowid,
-    3,
-    JSON.stringify({
-      breakfast: 'Eggs, whole grain toast, avocado, milk',
-      lunch: 'Lean beef stir-fry with vegetables, brown rice',
-      dinner: 'Grilled salmon, sweet potato, green salad',
-      snacks: 'Protein shake, nuts, dried fruits'
-    }),
-    'Increase calories by 450. Focus on iron absorption with vitamin C. Omega-3 for brain development.',
-    2450,
-    'Iron, Calcium, Protein, Omega-3, Vitamin K'
-  );
-
-  db.prepare(`
-    INSERT INTO nutrition_plans (userId, trimester, mealPlan, recommendations, calories, focusNutrients)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run(
-    mother2.lastInsertRowid,
-    2,
-    JSON.stringify({
-      breakfast: 'Fruits, yogurt, whole grain cereal',
-      lunch: 'Chicken sandwich with vegetables, soup',
-      dinner: 'Pasta with lean meat sauce, salad',
-      snacks: 'Nuts, fruits, cheese'
-    }),
-    'Continue prenatal vitamins. Small frequent meals to combat nausea.',
-    2200,
-    'Folate, Iron, Vitamin B6'
-  );
-
-  // Create immunization schedules
-  db.prepare(`
-    INSERT INTO immunization_schedules (userId, childName, dateOfBirth, vaccines, nextAppointment, completed)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run(
-    mother1.lastInsertRowid,
-    'Baby Mwangi',
-    '2023-06-15',
-    JSON.stringify([
-      { name: 'BCG', date: '2023-06-15', completed: true },
-      { name: 'Hepatitis B (1)', date: '2023-06-15', completed: true },
-      { name: 'Polio (1)', date: '2023-07-27', completed: true },
-      { name: 'DTaP (1)', date: '2023-07-27', completed: true },
-      { name: 'Hib (1)', date: '2023-07-27', completed: true },
-      { name: 'PCV (1)', date: '2023-07-27', completed: true },
-      { name: 'Rotavirus (1)', date: '2023-07-27', completed: true }
-    ]),
-    '2024-01-15',
-    0
-  );
-
-  db.prepare(`
-    INSERT INTO immunization_schedules (userId, childName, dateOfBirth, vaccines, nextAppointment, completed)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run(
-    mother2.lastInsertRowid,
-    'Baby Ochieng',
-    '2024-01-10',
-    JSON.stringify([
-      { name: 'BCG', date: '2024-01-10', completed: true },
-      { name: 'Hepatitis B (1)', date: '2024-01-10', completed: true }
-    ]),
-    '2024-02-21',
-    0
-  );
-
-  // Create emergency reports
-  db.prepare(`
-    INSERT INTO emergency_reports (userId, type, description, severity, status, providerNotes, location)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    mother1.lastInsertRowid,
-    'reduced-movement',
-    'Baby has reduced movement since yesterday morning',
-    'high',
-    'acknowledged',
-    'Mother advised to come for immediate checkup. CTG monitoring required.',
-    'Kasarani, Nairobi'
-  );
-
-  db.prepare(`
-    INSERT INTO emergency_reports (userId, type, description, severity, status, providerNotes, location)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    mother3.lastInsertRowid,
-    'bleeding',
-    'Light bleeding noticed this morning',
-    'medium',
-    'resolved',
-    'Examined - no cause for concern. Rest recommended.',
-    'Kenyatta Hospital'
-  );
-
-  db.prepare(`
-    INSERT INTO emergency_reports (userId, type, description, severity, status, providerNotes, location)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    mother2.lastInsertRowid,
-    'fever',
-    'High fever (39°C) since last night',
-    'critical',
-    'pending',
-    null,
-    'Kisumu'
-  );
-
+  // ...remaining seeding code commented out for isolation test...
   console.log('Database seeded successfully!');
   console.log('\nTest Accounts:');
   console.log('Admin: admin@lindamama.ke / password123');
