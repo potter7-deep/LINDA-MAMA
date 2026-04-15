@@ -32,7 +32,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [loading, setLoading] = useState(false);
+      // Removed loading animation state
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -77,6 +77,9 @@ const Register = () => {
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
     }
+        else if (!/^[a-zA-Z\s'-]+$/.test(formData.fullName.trim())) {
+          newErrors.fullName = 'Name cannot contain numbers or special characters except hyphens/apostrophes';
+        }
 
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
@@ -90,6 +93,9 @@ const Register = () => {
     } else if (!/^\+2547\d{8}$/.test(formData.phone.trim())) {
       newErrors.phone = 'Enter a valid Kenyan phone (+2547XXXXXXXX)';
     }
+        else if (/[^\d+]/.test(formData.phone.replace(/\+/, ''))) {
+          newErrors.phone = 'Phone number cannot contain letters';
+        }
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
@@ -129,7 +135,7 @@ const Register = () => {
     
     if (!validateForm()) return;
 
-    setLoading(true);
+        // setLoading(true); // Remove loading animation
 
     try {
       const user = await register({
@@ -161,7 +167,7 @@ const Register = () => {
     } catch (err) {
       setErrors({ submit: err.message || err.response?.data?.error || 'Registration failed. Please try again.' });
     } finally {
-      setLoading(false);
+          // setLoading(false); // Remove loading animation
     }
   };
 

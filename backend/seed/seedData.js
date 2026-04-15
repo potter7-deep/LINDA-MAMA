@@ -3,10 +3,10 @@ import db from '../config/database.js';
 
 const seedDatabase = async () => {
   console.log('[Database] Seeding with transaction...');
-  
+
   // Begin transaction for atomic seeding
   db.exec('BEGIN TRANSACTION;');
-  
+
   try {
     // Clear child tables first, then parents (reverse dependency order)
     db.exec('DELETE FROM messages;');
@@ -17,6 +17,22 @@ const seedDatabase = async () => {
     db.exec('DELETE FROM health_conditions;');
     db.exec('DELETE FROM pregnancy_records;');
     db.exec('DELETE FROM users;');
+    // ...existing code...
+    // End of seeding logic
+
+    db.exec('COMMIT;');
+    console.log('Database seeded successfully!');
+    console.log('\nTest Accounts:');
+    console.log('Admin: admin@lindamama.ke / password123');
+    console.log('Provider: provider@lindamama.ke / password123');
+    console.log('Mother: grace@email.com / password123');
+    console.log('Mother: faith@email.com / password123');
+    console.log('Mother: mercy@email.com / password123');
+  } catch (err) {
+    db.exec('ROLLBACK;');
+    console.error('Seeding failed:', err);
+  }
+};
 
     // Reset auto-increment
     db.exec(`
@@ -310,7 +326,5 @@ const seedDatabase = async () => {
   console.log('Mother: grace@email.com / password123');
   console.log('Mother: faith@email.com / password123');
   console.log('Mother: mercy@email.com / password123');
-};
-
 seedDatabase().catch(console.error);
 

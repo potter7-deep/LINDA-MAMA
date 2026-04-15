@@ -8,7 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  // Removed loading animation state
   const { login } = useAuth();
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -42,7 +42,7 @@ const Login = () => {
       return;
     }
 
-    setLoading(true);
+    // setLoading(true); // Remove loading animation
     try {
       const user = await login(email, password);
       if (user.role === 'admin') {
@@ -55,7 +55,7 @@ const Login = () => {
     } catch (err) {
       setError(err.message || err.response?.data?.error || 'Login failed. Please try again.');
     } finally {
-      setLoading(false);
+      // setLoading(false); // Remove loading animation
     }
   };
 
