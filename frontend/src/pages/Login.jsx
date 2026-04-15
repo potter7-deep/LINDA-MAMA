@@ -35,8 +35,14 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
+    // Email format validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    setLoading(true);
     try {
       const user = await login(email, password);
       if (user.role === 'admin') {
@@ -91,7 +97,7 @@ const Login = () => {
           <p className="text-neutral-500 dark:text-neutral-400 mb-8">Sign in to access your healthcare dashboard</p>
 
           {error && (
-            <div className="flex items-center gap-2 p-4 mb-6 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-700 rounded-xl text-danger-700 dark:text-danger-400">
+            <div className="flex items-center gap-2 p-4 mb-6 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-700 rounded-xl text-danger-700 dark:text-danger-400" role="alert" aria-live="assertive">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
               <p className="text-sm">{error}</p>
             </div>
@@ -111,6 +117,7 @@ const Login = () => {
                   className="input dark:input-dark pl-10"
                   placeholder="you@example.com"
                   required
+                  aria-label="Email address"
                 />
               </div>
             </div>
@@ -128,11 +135,13 @@ const Login = () => {
                   className="input dark:input-dark pl-10 pr-10"
                   placeholder="••••••••"
                   required
+                  aria-label="Password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300" />
@@ -155,17 +164,10 @@ const Login = () => {
 
           <button
             type="submit"
-            disabled={loading}
             className="btn-gradient-animated w-full py-3 flex items-center justify-center gap-2 text-white font-semibold rounded-xl"
           >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                Sign In
-                <ArrowRight className="w-5 h-5" />
-              </>
-            )}
+            Sign In
+            <ArrowRight className="w-5 h-5" />
           </button>
           </form>
 
@@ -204,37 +206,37 @@ const Login = () => {
       </div>
 
       {/* Right Side - Decorative */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 items-center justify-center p-12 relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-primary-500 via-primary-600 to-secondary-600 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 items-center justify-center p-12 relative overflow-hidden">
         {/* Animated gradient overlay */}
-        <div className="absolute inset-0 auth-bg-gradient opacity-90"></div>
+        <div className="absolute inset-0 auth-bg-gradient opacity-90 dark:opacity-80 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900"></div>
         {/* Animated orbs */}
         <div className="floating-particles absolute inset-0 pointer-events-none" />
-        <div className="max-w-lg text-center text-white">
-          <div className="w-24 h-24 mx-auto mb-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm animate-pulse">
-            <Heart className="w-12 h-12" />
+        <div className="max-w-lg text-center text-white dark:text-primary-100">
+          <div className="w-24 h-24 mx-auto mb-8 bg-white/20 dark:bg-primary-700/30 rounded-full flex items-center justify-center backdrop-blur-sm animate-pulse">
+            <Heart className="w-12 h-12 text-primary-600 dark:text-primary-300" />
           </div>
-          <h2 className="text-3xl font-bold mb-4">
+          <h2 className="text-3xl font-bold mb-4 text-white dark:text-primary-100">
             Your Health, Our Priority
           </h2>
-          <p className="text-primary-100 text-lg mb-8">
+          <p className="text-primary-100 dark:text-primary-200 text-lg mb-8">
             Comprehensive maternal healthcare management system for expectant and nursing mothers.
           </p>
           <div className="grid grid-cols-2 gap-4 text-left">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+            <div className="bg-white/10 dark:bg-primary-900/40 backdrop-blur-sm rounded-xl p-4">
               <div className="text-3xl font-bold">🤰</div>
-              <p className="text-sm text-primary-100 mt-2">Pregnancy Tracking</p>
+              <p className="text-sm text-primary-100 dark:text-primary-200 mt-2">Pregnancy Tracking</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+            <div className="bg-white/10 dark:bg-primary-900/40 backdrop-blur-sm rounded-xl p-4">
               <div className="text-3xl font-bold">🥗</div>
-              <p className="text-sm text-primary-100 mt-2">Nutrition Plans</p>
+              <p className="text-sm text-primary-100 dark:text-primary-200 mt-2">Nutrition Plans</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+            <div className="bg-white/10 dark:bg-primary-900/40 backdrop-blur-sm rounded-xl p-4">
               <div className="text-3xl font-bold">💉</div>
-              <p className="text-sm text-primary-100 mt-2">Immunization</p>
+              <p className="text-sm text-primary-100 dark:text-primary-200 mt-2">Immunization</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+            <div className="bg-white/10 dark:bg-primary-900/40 backdrop-blur-sm rounded-xl p-4">
               <div className="text-3xl font-bold">🏥</div>
-              <p className="text-sm text-primary-100 mt-2">Emergency Care</p>
+              <p className="text-sm text-primary-100 dark:text-primary-200 mt-2">Emergency Care</p>
             </div>
           </div>
         </div>

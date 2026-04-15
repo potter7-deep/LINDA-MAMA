@@ -1,30 +1,8 @@
 import { Loader2 } from 'lucide-react';
 
-const Loading = ({ size = 'md', text = 'Loading...', fullScreen = false }) => {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12',
-    xl: 'w-16 h-16',
-  };
 
-  const container = (
-    <div className="flex flex-col items-center justify-center gap-3">
-      <Loader2 className={`${sizeClasses[size]} animate-spin text-primary-500`} />
-      {text && <p className="text-sm text-neutral-500">{text}</p>}
-    </div>
-  );
-
-  if (fullScreen) {
-    return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        {container}
-      </div>
-    );
-  }
-
-  return container;
-};
+// Loading component removed for instant navigation
+const Loading = () => null;
 
 // Skeleton components for loading states
 export const Skeleton = ({ className = '' }) => (

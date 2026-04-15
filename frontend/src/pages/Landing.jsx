@@ -69,14 +69,14 @@ const Landing = () => {
                 to="/register"
                 className="px-5 py-2.5 bg-gradient-to-r from-primary-500 via-secondary-500 to-purple-600 text-white font-medium rounded-lg hover:from-primary-600 hover:to-purple-700 transition-all shadow-lg shadow-primary-500/25"
               >
-Sign Up
+                Sign Up
               </Link>
             </div>
           </div>
         </nav>
 
         {/* Hero Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-1 md:py-24">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-1 md:py-20">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="text-center md:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 dark:bg-primary-900/30 rounded-full text-primary-700 dark:text-primary-300 text-sm font-medium mb-6">

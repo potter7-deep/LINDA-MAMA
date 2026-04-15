@@ -21,11 +21,14 @@ router.post('/register', [
   body('password').isLength({ min: 6 }),
   body('fullName').trim().notEmpty(),
   body('role').isIn(['mother', 'provider', 'admin']),
-  body('phone').optional().trim(),
+  body('phone')
+    .if(body('phone').exists())
+    .matches(/^\+2547\d{8}$/)
+    .withMessage('Phone must be a valid Kenyan number (+2547XXXXXXXX)'),
   body('dateOfBirth').optional().isISO8601(),
   body('address').optional().trim(),
-  body('region').optional(),
-  body('hospitals').optional().isArray()
+  body('region').if(body('role').equals('provider')).notEmpty().withMessage('Region is required for providers'),
+  body('hospitals').if(body('role').equals('provider')).isArray({ min: 1 }).withMessage('At least one hospital is required for providers')
 ], validate, async (req, res) => {
   try {
     const { email, password, fullName, role, phone, dateOfBirth, address } = req.body;
@@ -55,7 +58,12 @@ router.post('/register', [
       token
     });
   } catch (error) {
-    res.status(500).json({ error: 'Registration failed' });
+    console.error('Registration error:', error);
+    if (error.errors) {
+      // express-validator errors
+      return res.status(400).json({ error: 'Validation failed', details: error.errors });
+    }
+    res.status(500).json({ error: 'Registration failed', details: error.message });
   }
 
 });
