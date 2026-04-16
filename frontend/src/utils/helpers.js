@@ -122,14 +122,49 @@ export const getStatusColor = (status) => {
   return colors[status] || colors.pending;
 };
 
-// Validation helpers
+// Enhanced Validation helpers for type strictness
+export const isTextOnly = (str) => {
+  return /^[a-zA-Z\s'-.,]+$/.test(str);
+};
+
+export const isNumericOnly = (str) => {
+  return /^[0-9.]+$/.test(str) || /^[0-9+-]+$/.test(str);
+};
+
+export const isPhoneNumeric = (str) => {
+  return /^[+\d\s-()]+$/.test(str);
+};
+
+// Real-time input handlers to prevent invalid characters
+export const handleTextInput = (e) => {
+  const value = e.target.value;
+  if (!isTextOnly(value)) {
+    e.target.value = value.replace(/[^a-zA-Z\s'-.,]/g, '');
+  }
+};
+
+export const handleNumberInput = (e) => {
+  const value = e.target.value;
+  if (!isNumericOnly(value)) {
+    e.target.value = value.replace(/[^0-9.+-]/g, '');
+  }
+};
+
+export const handlePhoneInput = (e) => {
+  const value = e.target.value;
+  if (!isPhoneNumeric(value)) {
+    e.target.value = value.replace(/[^\d+]/g, '');
+  }
+};
+
+// Existing validation
 export const validateEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(email);
 };
 
 export const validatePhone = (phone) => {
-  const re = /^\+?[\d\s-()]{10,}$/;
+  const re = /^\+2547\d{8}$/;
   return re.test(phone);
 };
 
@@ -138,6 +173,9 @@ export const validatePassword = (password) => {
   
   if (password.length < 6) {
     errors.push('Password must be at least 6 characters');
+  }
+  if (!/^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9!@#$%^&*]{6,}$/.test(password)) {
+    errors.push('Must contain letters and numbers');
   }
   
   return {

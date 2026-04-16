@@ -214,8 +214,13 @@ const Exercise = () => {
                   min="1"
                   max="180"
                   value={formData.duration}
-                  onChange={(e) => setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) || 0 }))}
+                  onChange={(e) => {
+                    if (/[^0-9]/.test(e.target.value)) return;
+                    setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) || 0 }));
+                  }}
                   className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-xl bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   required
                 />
               </div>

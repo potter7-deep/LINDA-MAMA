@@ -212,10 +212,15 @@ const PregnancyTracker = () => {
                 <input
                   type="number"
                   value={formData.weeks}
-                  onChange={(e) => setFormData({ ...formData, weeks: parseInt(e.target.value) })}
+                  onChange={(e) => {
+                    if (/[^0-9]/.test(e.target.value)) return;
+                    setFormData({ ...formData, weeks: parseInt(e.target.value) });
+                  }}
                   className="input dark:input-dark"
                   min="1"
                   max="42"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                 />
               </div>
               <div>
@@ -223,9 +228,14 @@ const PregnancyTracker = () => {
                 <input
                   type="number"
                   value={formData.weight}
-                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  onChange={(e) => {
+                    if (/[^0-9.]/.test(e.target.value)) return;
+                    setFormData({ ...formData, weight: e.target.value });
+                  }}
                   className="input dark:input-dark"
                   step="0.1"
+                  inputMode="numeric"
+                  pattern="[0-9.]*"
                 />
               </div>
               <div>

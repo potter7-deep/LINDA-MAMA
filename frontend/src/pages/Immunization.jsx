@@ -125,6 +125,8 @@ const Immunization = () => {
                   value={formData.childName}
                   onChange={(e) => setFormData({ ...formData, childName: e.target.value })}
                   className="input dark:input-dark"
+                  pattern="[a-zA-Z\\s'-.,]+"
+                  inputMode="text"
                   required
                 />
               </div>

@@ -18,15 +18,15 @@ const validate = (req, res, next) => {
 // Register new user
 router.post('/register', [
   body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 6 }),
-  body('fullName').trim().notEmpty(),
+  body('password').isLength({ min: 6 }).matches(/^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9!@#$%^&*]{6,}$/).withMessage('Password must contain letters and numbers'),
+  body('fullName').trim().notEmpty().matches(/^[a-zA-Z\\s'-.,]+$/i).withMessage('Full name must contain only letters and common name characters'),
   body('role').isIn(['mother', 'provider', 'admin']),
   body('phone')
     .if(body('phone').exists())
     .matches(/^\+2547\d{8}$/)
     .withMessage('Phone must be a valid Kenyan number (+2547XXXXXXXX)'),
   body('dateOfBirth').optional().isISO8601(),
-  body('address').optional().trim(),
+  body('address').optional().trim().matches(/^[a-zA-Z0-9\\s'-.,#]+$/).withMessage('Address must contain valid characters'),
   body('region').if(body('role').equals('provider')).notEmpty().withMessage('Region is required for providers'),
   body('hospitals').if(body('role').equals('provider')).isArray({ min: 1 }).withMessage('At least one hospital is required for providers')
 ], validate, async (req, res) => {
@@ -130,9 +130,9 @@ router.get('/me', authenticateToken, async (req, res) => {
 
 // Update profile
 router.put('/profile', authenticateToken, [
-  body('fullName').optional().trim().notEmpty(),
-  body('phone').optional().trim(),
-  body('address').optional().trim(),
+  body('fullName').optional().trim().notEmpty().matches(/^[a-zA-Z\\s'-.,]+$/i).withMessage('Full name must contain only letters and common name characters'),
+  body('phone').optional().trim().matches(/^\+2547\d{8}$/).withMessage('Phone must be a valid Kenyan number (+2547XXXXXXXX)'),
+  body('address').optional().trim().matches(/^[a-zA-Z0-9\\s'-.,#]+$/).withMessage('Address must contain valid characters'),
   body('dateOfBirth').optional().isISO8601()
 ], validate, (req, res) => {
   try {

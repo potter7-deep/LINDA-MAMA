@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Heart, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, Moon, Sun } from 'lucide-react';
+import { validateEmail, validatePassword, handleTextInput } from '../utils/helpers.js';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -32,17 +33,34 @@ const Login = () => {
     setIsDarkMode(!isDarkMode);
   };
 
+  const handleEmailChange = (e) => {
+    handleTextInput(e);
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const validateLoginForm = () => {
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email address.');
+      return false;
+    }
+    const pwValidation = validatePassword(password);
+    if (!pwValidation.isValid) {
+      setError(pwValidation.errors[0]);
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Email format validation
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
+    if (!validateLoginForm()) return;
 
-    // setLoading(true); // Remove loading animation
     try {
       const user = await login(email, password);
       if (user.role === 'admin') {
@@ -54,8 +72,6 @@ const Login = () => {
       }
     } catch (err) {
       setError(err.message || err.response?.data?.error || 'Login failed. Please try again.');
-    } finally {
-      // setLoading(false); // Remove loading animation
     }
   };
 
@@ -113,10 +129,12 @@ const Login = () => {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                   className="input dark:input-dark pl-10"
                   placeholder="you@example.com"
                   required
+                  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                  inputMode="email"
                   aria-label="Email address"
                 />
               </div>
@@ -131,10 +149,12 @@ const Login = () => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
                   className="input dark:input-dark pl-10 pr-10"
                   placeholder="••••••••"
                   required
+                  pattern="^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9!@#$%^&*]{6,}$"
+                  inputMode="text"
                   aria-label="Password"
                 />
                 <button

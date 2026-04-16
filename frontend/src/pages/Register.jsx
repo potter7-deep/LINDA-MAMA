@@ -273,6 +273,8 @@ const Register = () => {
                   onChange={handleChange}
                   className={`input pl-10 ${errors.fullName ? 'input-error' : ''}`}
                   placeholder="Your full name"
+                  pattern="[a-zA-Z\\s'-.,]+"
+                  inputMode="text"
                 />
               </div>
               {errors.fullName && <p className="input-error-message">{errors.fullName}</p>}
@@ -291,6 +293,8 @@ const Register = () => {
                   onChange={handleChange}
                   className={`input pl-10 ${errors.email ? 'input-error' : ''}`}
                   placeholder="you@example.com"
+                  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+                  inputMode="email"
                 />
               </div>
               {errors.email && <p className="input-error-message">{errors.email}</p>}
@@ -310,6 +314,8 @@ const Register = () => {
                     onChange={handleChange}
                     className={`input pl-10 ${errors.phone ? 'input-error' : ''}`}
                     placeholder="+2547XXXXXXXX"
+                    pattern="[+]?[0-9]{10,15}"
+                    inputMode="tel"
                     aria-label="Phone number"
                   />
                 </div>
@@ -347,6 +353,8 @@ const Register = () => {
                   onChange={handleChange}
                   className="input pl-10"
                   placeholder="Your address"
+                  pattern="[a-zA-Z0-9\\s'-.,#]+"
+                  inputMode="text"
                 />
               </div>
             </div>
@@ -455,6 +463,8 @@ const Register = () => {
                     onChange={handleChange}
                     className={`input pl-10 pr-10 ${errors.password ? 'input-error' : ''}`}
                     placeholder="••••••••"
+                    pattern="^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9!@#$%^&*]{6,}$"
+                    inputMode="text"
                     aria-label="Password"
                   />
                   <button
